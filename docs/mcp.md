@@ -69,10 +69,14 @@ rr_promote   ir=<RelOp from question>
 | `rr_rag` | Semantic/causal RAG: RelOp knn + LangChain/Chroma MiniLM (sandboxOnly) |
 | `rr_causal` | CausalPlan: pair / attach / intervene / vs_world (sandboxOnly) |
 | `rr_chroma` | Dummy Chroma overlay status or resync |
-| `rr_automine` | Mine → RelOp reflect → possible etiology evidence → expand catalog follow-ons → citation-grounded report |
-| `rr_report` | Planner → researcher → reporter → validator. Cites RelOp / catalog NCBI / KPI cards only. Local SLM or cloud API if provided |
+| `rr_automine` | Detect domain (gene / finance) → recall evidence memory → RelOp reflect → gate (`supported` / `review_required` / `refused` / `failed`) → possible-cause evidence → remember in the vector overlay → expand catalog follow-ons → citation-grounded report. Reuses a finished run by key |
+| `rr_recall` | knn over remembered automine evidence (`AutomineEvidence` overlay chunks). Dummy only |
+| `rr_report` | Planner → researcher → reporter → validator. Cites RelOp / catalog accession or ticker / KPI cards only. Local SLM or cloud API if provided |
+| `rr_autonomy` | Autonomy loop on atomic relations (`spec/autonomy.json`): seed atom chains from the goal → grammar check → dummy rollout → goal score → mutate one atom → keep winners → replay winner live. With no objective it runs self-directed (same as `rr_hypothesize`) |
+| `rr_hypothesize` | Self-directed loop (`spec/hypotheses.json`): survey the booted schema → form testable hypotheses (concentration, contrast, association, correlation, trend) → test each as a RelOp chain, dummy ticket then verdict from live rows → derive follow-ups from supported results (drill into the slice, try to refute via peers) → remember in `.revolverelate/hypotheses.json` and the evidence overlay → search from the strongest supported hypothesis. Verdicts are threshold comparisons, not causes |
 | `rr_kpi` | Bound domain KPI (dummy then live) |
 | `rr_gene` | Write the public NCBI FASTA pineoblastoma sample |
+| `rr_finance` | Write the equities price-move sample (yfinance daily bars when installed, baked otherwise). Not a forecast, not investment advice |
 
 Resources: `revolverelate://instructions`, `revolverelate://install`, `revolverelate://primitives`, `revolverelate://composites`, `revolverelate://engines`, `revolverelate://build`, `revolverelate://graph`, `revolverelate://rag`.
 

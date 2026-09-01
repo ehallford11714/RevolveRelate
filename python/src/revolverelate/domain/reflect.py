@@ -1,4 +1,8 @@
-"""Pivot + splice for the automine reflect agent. Re-cause each pass until a goal lands."""
+"""Pivot + splice for the automine reflect agent. Re-cause each pass until a goal lands.
+
+Domain-neutral: pivot columns, families, and the catalog come from the detected
+spec/domain-*.json (see revolverelate.domain.registry).
+"""
 
 from __future__ import annotations
 
@@ -16,7 +20,13 @@ def _clip(text: str, n: int = 96) -> str:
     return body[:n].rstrip()
 
 
-def splice_details(causal: dict | None, *, proposed: list[str] | None = None, added: list[str] | None = None) -> dict:
+def splice_details(
+    causal: dict | None,
+    *,
+    proposed: list[str] | None = None,
+    added: list[str] | None = None,
+    catalog: dict | None = None,
+) -> dict:
     """Pull cause/effect/cue/symbols from a live causal RelOp so the next ask can splice them."""
     live = (causal or {}).get("live") if isinstance(causal, dict) else {}
     rows = (live or {}).get("rows") or []
@@ -31,7 +41,7 @@ def splice_details(causal: dict | None, *, proposed: list[str] | None = None, ad
     blob = " ".join([flatten_cells(rows), " ".join(proposed or []), " ".join(added or [])])
     symbols = []
     seen: set[str] = set()
-    for rec in extract_targets(blob, known=set(), catalog=catalog_targets()):
+    for rec in extract_targets(blob, known=set(), catalog=catalog if catalog is not None else catalog_targets()):
         symbol = str(rec.get("symbol") or "")
         if symbol and symbol.casefold() not in seen:
             seen.add(symbol.casefold())
@@ -70,10 +80,10 @@ def splice_question(seed: str, details: dict, *, column: str | None = None, fami
     return _clip(ask, 400)
 
 
-def next_pivot_column(graph, asked: str, *, live_pairs: int) -> str | None:
-    """When live pairs are empty, rotate Abstract → Evidence → Summary → Header if those columns exist."""
+def next_pivot_column(graph, asked: str, *, live_pairs: int, columns: tuple[str, ...] | list[str] | None = None) -> str | None:
+    """When live pairs are empty, rotate through the domain's text columns that exist on this schema."""
     dims = {d.casefold(): d for d in list_dimensions(graph)}
-    cycle = [dims[c.casefold()] for c in _PIVOT_COLUMNS if c.casefold() in dims]
+    cycle = [dims[c.casefold()] for c in (columns or _PIVOT_COLUMNS) if c.casefold() in dims]
     if not cycle:
         return None
     words = set(re.findall(r"[a-z0-9]+", (asked or "").casefold()))
@@ -84,13 +94,14 @@ def next_pivot_column(graph, asked: str, *, live_pairs: int) -> str | None:
     return cycle[(i + 1) % len(cycle)]
 
 
-def next_family(pass_no: int) -> str:
-    """Rotate gene → epitope → siRNA so later passes can cover those catalogs."""
-    return _FAMILIES[max(int(pass_no) - 1, 0) % len(_FAMILIES)]
+def next_family(pass_no: int, families: tuple[str, ...] | list[str] | None = None) -> str:
+    """Rotate the domain's families so later passes cover each catalogue."""
+    fams = tuple(families or _FAMILIES)
+    return fams[max(int(pass_no) - 1, 0) % len(fams)]
 
 
 def goal_reached(spec: dict, *, details: dict, spliced: bool, mined: list[str], etiologies: list | None = None) -> dict:
-    """Declared evidence goal: enough possible etiologies after a spliced re-cause. Not proof."""
+    """Declared evidence goal: enough possible candidates after a spliced re-cause. Not proof."""
     goal = spec.get("goal") if isinstance(spec.get("goal"), dict) else {}
     min_pairs = int(goal.get("minLivePairs") or 1)
     min_tokens = int(goal.get("minSplicedTokens") or 1)
@@ -120,4 +131,41 @@ def goal_reached(spec: dict, *, details: dict, spliced: bool, mined: list[str], 
         "spliced": spliced,
         "mineFollowOn": need_mine,
         "mined": list(mined or []),
+    }
+
+
+def gate_verdict(spec: dict, *, details: dict, etiologies: list | None, text_column: str | None, error: str | None = None) -> dict:
+    """Kineteq-style production gate on one pass: supported / review_required / refused / failed.
+
+    refused  — no bound text column or no live cue pairs: nothing to pair, so do not invent.
+    review   — live pairs but no catalogued candidate in them.
+    supported — live pairs name at least one catalogued candidate. Still heuristic, still none.
+    """
+    rules = spec.get("gate") if isinstance(spec.get("gate"), dict) else {}
+    if error:
+        return {"verdict": "failed", "missing": [], "reason": str(error)[:200], "identification": "none"}
+    pairs = int(details.get("livePairs") or 0)
+    cands = {str(e.get("candidate") or "") for e in (etiologies or []) if e.get("candidate")}
+    from_pairs = {str(e.get("candidate") or "") for e in (etiologies or []) if e.get("cue") and e.get("cue") != "catalog"}
+    missing: list[str] = []
+    if not text_column:
+        missing.append("text_column")
+    if pairs < int(rules.get("minLivePairs") or 1):
+        missing.append("live_pairs")
+    if not from_pairs:
+        missing.append("catalogued_candidate_in_pair")
+    if "text_column" in missing or "live_pairs" in missing:
+        verdict = "refused"
+    elif "catalogued_candidate_in_pair" in missing:
+        verdict = "review_required"
+    else:
+        verdict = "supported"
+    return {
+        "verdict": verdict,
+        "missing": missing,
+        "livePairs": pairs,
+        "candidates": sorted(cands),
+        "identification": "none",
+        "evidenceGrade": "heuristic",
+        "note": str(rules.get("note") or "Gate on bound RelOp evidence. Supported means pairs named a catalogued candidate — not proof."),
     }

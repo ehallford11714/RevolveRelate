@@ -94,5 +94,19 @@
     "column": "Abstract",
     "geneDimension": "Symbol"
   },
+  "automine": {
+    "detect": ["Symbol", "Abstract", "Cases"],
+    "symbolEntity": "Gene",
+    "symbolColumn": "Symbol",
+    "kpi": "cases_by_gene",
+    "scanEntities": ["Disease", "Gene", "GeneDisease"],
+    "pivotColumns": ["Abstract", "Evidence", "Summary", "Header"],
+    "families": ["gene", "epitope", "sirna"],
+    "evidenceKind": "possible_etiology",
+    "evidenceLabel": "possible etiology",
+    "candidateLabel": "gene",
+    "defaultQuestion": "what causes pinealblastoma",
+    "citationLocator": "spec/domain-gene.json"
+  },
   "honesty": "Pearl identification is not claimed. Overlay chunks public abstracts and FASTA headers; live overlay is TEMP from live non-PII text after a dummy ticket."
 }

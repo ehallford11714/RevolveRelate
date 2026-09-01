@@ -52,6 +52,11 @@ def test_automine_reflects_then_mines_follow_ons(tmp_path):
     assert state.get("conclusive") is False
     assert state.get("identification") == "none"
     assert state.get("evidenceGrade") == "heuristic"
+    assert state.get("domain") == "gene"
+    assert state.get("evidenceKind") == "possible_etiology"
+    assert state["gate"]["overall"] == "supported"
+    assert all(e.get("gate") in {"supported", "review_required", "refused", "failed"} for e in state["etiologies"])
+    assert state["memory"]["evidenceRows"] >= 1
     cands = set(state.get("candidates") or [])
     assert len(state.get("etiologies") or []) >= 3
     assert cands & {"DICER1", "DROSHA", "DGCR8", "RB1", "PLAGL2", "CCND2"}

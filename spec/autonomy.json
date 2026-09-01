@@ -1,0 +1,71 @@
+{
+  "id": "autonomy",
+  "title": "Autonomy loop on atomic relations",
+  "description": "A goal in English becomes bound slots (measure, dimension, slice). The loop seeds chains of atoms, checks each against spec/analytics-composites.json, rolls legal chains out on the dummy sandbox, scores them against the goal, keeps the best, mutates them one atom at a time, and repeats until the budget or a stable best. The winner is a RelOp with a dummy ticket; it may then replay live. Never SQL from an SLM.",
+  "kind": "runner",
+  "unit": "one analytics primitive from spec/analytics-primitives.json",
+  "loop": ["goal", "seed", "propose", "check", "rollout", "score", "select", "mutate", "record", "stop", "replay"],
+  "selfDirected": {
+    "when": "no objective is given",
+    "spec": "spec/hypotheses.json",
+    "note": "The engine forms and tests its own hypotheses first; the strongest supported one becomes the objective of this search."
+  },
+  "budget": {
+    "generations": 4,
+    "minGenerations": 2,
+    "hardMaxGenerations": 12,
+    "population": 6,
+    "keep": 3,
+    "patience": 2,
+    "maxDepth": 12
+  },
+  "seeds": {
+    "fromGoal": ["sum_by", "count_by", "share_total", "slice_sum_by", "positive_sum_by"],
+    "fromComposites": true,
+    "fromMemory": true,
+    "memoryFile": ".revolverelate/autonomy.json"
+  },
+  "mutations": [
+    {"id": "swap_measure", "text": "Rebind a measure slot to another schema measure (prefer the goal measure)."},
+    {"id": "swap_dimension", "text": "Rebind a dimension slot to another schema dimension (prefer the goal dimension)."},
+    {"id": "add_restrict", "atoms": ["eq", "measure_positive", "gt"], "text": "Insert one restrict atom using a schema sample value or a zero threshold."},
+    {"id": "add_cut", "atoms": ["top_n", "above_mean", "threshold_above"], "text": "Insert one cut atom after the collapse."},
+    {"id": "add_compare", "atoms": ["vs_peer", "contribution"], "text": "Insert one compare atom after the collapse."},
+    {"id": "finish", "atoms": ["sort_value_desc", "limit"], "text": "Ensure the chain ends with an order and a cap."},
+    {"id": "drop_atom", "text": "Remove one non-source atom."},
+    {"id": "splice", "text": "Prefix of one parent up to its collapse plus the suffix of another parent from its collapse."}
+  ],
+  "placement": "A new atom is inserted where its phase rank fits (non-decreasing). check_chain still decides legality; illegal chains never reach the sandbox.",
+  "score": {
+    "weights": {
+      "legal": 1.0,
+      "ran": 2.0,
+      "rows": 1.0,
+      "goalMeasure": 1.5,
+      "goalDimension": 1.5,
+      "goalSlice": 1.0,
+      "magnitude": 0.5,
+      "novelty": 0.75,
+      "depth": -0.25
+    },
+    "rowBand": [1, 50],
+    "magnitudeLog": 1000000,
+    "note": "A search heuristic over RelOps that ran on the dummy. Not business truth, not causal truth."
+  },
+  "stop": {
+    "target": 9.0,
+    "reasons": ["target", "patience", "generations", "hardMaxGenerations"]
+  },
+  "record": {
+    "askLog": true,
+    "pattern": "autonomy",
+    "plansPrefix": "auto"
+  },
+  "slm": {
+    "optional": true,
+    "may": ["propose bind names that resolve in the built schema"],
+    "neverSql": true,
+    "neverNewAtoms": true
+  },
+  "honesty": "Winning chains are RelOps that ran on the dummy sandbox and, when allowed, replayed live. The score is a search heuristic. Identification is none."
+}

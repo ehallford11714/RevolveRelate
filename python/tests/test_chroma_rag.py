@@ -52,7 +52,9 @@ def test_chroma_causal_filters_and_roles(tmp_path):
     rr.close()
 
 
-def test_rag_relop_plus_chroma_and_mcp(tmp_path):
+def test_rag_relop_plus_chroma_and_mcp(tmp_path, monkeypatch):
+    # rag() only consults Chroma when the physical MiniLM path is opted in; the RelOp path never depends on it.
+    monkeypatch.setenv("REVOLVERELATE_CHROMA", "1")
     live = write_superstore(tmp_path / "superstore.sqlite")
     rr = RevolveRelate.connect(str(live), workdir=tmp_path)
     rr.build()

@@ -29,7 +29,11 @@ The language model never writes SQL. It never invents paper citations. Identific
 | Write the Superstore sample and ask a question | `python -m revolverelate superstore` then `ask "customers in West"` |
 | Semantic or causal retrieve | `python -m revolverelate rag "bookcase binders" --dsn ./superstore.sqlite` |
 | Possible etiologies + cited report | `python -m revolverelate automine --question "what causes pinealblastoma"` |
-| Agent loop in Cursor / VS Code / Claude | `rr_boot` → `rr_question` / `rr_rag` → `rr_automine` → `rr_report` |
+| Equities price moves: possible drivers + cited report | `python -m revolverelate automine --domain finance --question "what causes AAPL price moves"` |
+| Query what the autominer remembered | `python -m revolverelate recall --dsn ./equities.sqlite --query "AAPL fell because volume"` |
+| Let the engine search atom chains for a goal | `python -m revolverelate autonomy --objective "west sales by category"` |
+| Let the engine form and test its own hypotheses | `python -m revolverelate hypothesize --dsn ./superstore.sqlite --brief` |
+| Agent loop in Cursor / VS Code / Claude | `rr_boot` → `rr_question` / `rr_rag` → `rr_hypothesize` / `rr_autonomy` → `rr_automine` → `rr_recall` → `rr_report` |
 
 Guided write-up: [docs/tutorial.md](docs/tutorial.md).
 
@@ -40,7 +44,9 @@ Guided write-up: [docs/tutorial.md](docs/tutorial.md).
 3. `ask` — English becomes RelOp, RelOp becomes SQL, SQL runs on the dummy sandbox.
 4. `analytics` / `rag` / `causal` — named recipes, OverlayChunk retrieve, or a why-question. Dummy first; the same RelOp can replay live.
 5. `promote` — live only if the build cache is complete and the sandbox run was saved.
-6. `automine` then `report` — on a catalogued corpus, collect possible etiology evidence and draft a citation-bound report. Not a discovery claim.
+6. `automine` then `report` — on a catalogued corpus, detect the domain (gene abstracts or equity price moves), collect possible-cause evidence, gate every pass (`supported` / `review_required` / `refused` / `failed`), remember the evidence in the vector overlay so later passes can recall it, and draft a citation-bound report. Not a discovery claim, not investment advice.
+7. `autonomy` — give a goal in English. The loop seeds chains of RelOp atoms, rejects illegal chains before they run, rolls the rest out on the dummy, scores them against the goal, mutates one atom at a time, and replays the winner live. Winners seed the next run. The score is a search heuristic, not truth.
+8. `hypothesize` (or `autonomy` with no objective) — give it nothing. The engine surveys the schema, forms testable hypotheses (concentration, contrast, association, correlation, trend), tests each as a RelOp chain with the verdict taken from live rows after a dummy ticket, derives follow-ups from supported results (drill into the winning slice, try to refute by generalising to peers), remembers every test so nothing is re-run, and then searches from the strongest supported hypothesis. Verdicts are threshold comparisons, not causal claims.
 
 ```bash
 pip install -e python
@@ -49,6 +55,10 @@ python -m revolverelate superstore --dest ./superstore.sqlite
 python -m revolverelate ask "customers in West" --dsn ./superstore.sqlite
 python -m revolverelate rag "bookcase binders" --dsn ./superstore.sqlite --strategy semantic
 python -m revolverelate automine --question "what causes pinealblastoma"
+python -m revolverelate finance --dest ./equities.sqlite            # pip install -e "python[finance]" for live yfinance bars
+python -m revolverelate automine --dsn ./equities.sqlite --question "what causes AAPL price moves"
+python -m revolverelate autonomy --objective "west sales by category" --dsn ./superstore.sqlite
+python -m revolverelate hypothesize --dsn ./equities.sqlite --brief   # self-directed: form, test, derive, remember
 python -m revolverelate.mcp --install
 ```
 

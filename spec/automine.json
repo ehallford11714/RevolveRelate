@@ -1,27 +1,53 @@
 {
   "id": "automine",
   "title": "Corpus automine runner",
-  "description": "Mine a catalogued corpus, reflect with RelOps, collect possible etiology evidence (not proof), splice cues into the next ask, pivot, re-cause, expand follow-ons. Identification is none. The SLM never writes SQL.",
+  "description": "Mine a catalogued corpus, reflect with RelOps, collect possible-cause evidence (not proof), splice cues into the next ask, pivot, re-cause, expand catalogued follow-ons. Domain-neutral: the detected spec/domain-*.json supplies the catalog, KPI, scan entities, pivot columns, families, and evidence label. Identification is none. The SLM never writes SQL.",
   "kind": "runner",
-  "loop": ["mine", "ask", "reflect", "evidence", "splice", "pivot", "cause", "expand", "rebuild"],
+  "loop": ["detect", "recall", "mine", "ask", "reflect", "gate", "evidence", "remember", "splice", "pivot", "cause", "expand", "rebuild"],
   "stop": {
     "defaultPasses": 3,
     "hardMaxPasses": 8,
     "untilStable": true,
     "stableWhen": ["goalReached", "noNewTargets"]
   },
+  "domains": {
+    "detect": "Each spec/domain-*.json has an automine.detect column list. The domain whose columns all exist on the booted schema wins; gene and finance ship.",
+    "fallback": "gene",
+    "note": "Per-domain reflect settings live in the domain spec (automine block), not here."
+  },
   "reflect": {
     "ask": true,
     "causal": true,
-    "kpi": "cases_by_gene",
-    "scanEntities": ["Disease", "Gene", "GeneDisease"],
-    "extract": ["symbol", "accession"],
-    "pivotColumns": ["Abstract", "Evidence", "Summary", "Header"],
-    "families": ["gene", "epitope", "sirna"]
+    "recall": true,
+    "recallN": 5
   },
   "expand": {
     "maxNewPerPass": 2,
     "catalog": "followOn"
+  },
+  "gate": {
+    "verdicts": ["supported", "review_required", "refused", "failed"],
+    "minLivePairs": 1,
+    "supported": "live cue pairs name at least one catalogued candidate",
+    "review_required": "live pairs exist but no catalogued candidate appears in them",
+    "refused": "no bound text column or no live pairs — nothing is invented",
+    "failed": "the RelOp raised",
+    "inspiration": "kineteq-ai-v2 autocausal bridge / CausalRun verdicts",
+    "note": "Gate on bound RelOp evidence. Supported means pairs named a catalogued candidate — not proof."
+  },
+  "reuse": {
+    "enabled": true,
+    "keyFrom": ["domain", "question"],
+    "when": "a saved .revolverelate/automine.json has the same reuseKey and stop=goalReached",
+    "override": "rerun=true",
+    "inspiration": "kineteq-ai-v2 CausalRun.task_key"
+  },
+  "memory": {
+    "vector": true,
+    "entity": "AutomineEvidence",
+    "column": "Evidence",
+    "strategies": ["semantic", "causal"],
+    "note": "Evidence rows are chunked into the dummy OverlayChunk so the next pass can knn-recall them with the same RelOp as live text. Chroma syncs from the same table when opted in. Never a live table."
   },
   "goal": {
     "minLivePairs": 1,
@@ -33,5 +59,5 @@
     "evidenceGrade": "heuristic",
     "conclusive": false
   },
-  "honesty": "Possible etiology evidence from bound RelOp pairs and catalogued genes. Identification is none. Not conclusive proof, not a discovery claim."
+  "honesty": "Possible-cause evidence from bound RelOp pairs and catalogued candidates. Identification is none. Not conclusive proof, not a discovery claim, not investment advice."
 }

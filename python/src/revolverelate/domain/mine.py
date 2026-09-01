@@ -25,7 +25,7 @@ def domain_catalog(domain: str = "gene") -> dict:
 def catalog_targets(spec: dict | None = None) -> dict[str, dict]:
     spec = spec if isinstance(spec, dict) else domain_catalog()
     out: dict[str, dict] = {}
-    for row in list(spec.get("accessions") or []) + list(spec.get("followOn") or []):
+    for row in list(spec.get("accessions") or []) + list(spec.get("universe") or []) + list(spec.get("followOn") or []):
         if not isinstance(row, dict):
             continue
         symbol = str(row.get("symbol") or "").strip()

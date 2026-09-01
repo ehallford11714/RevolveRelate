@@ -41,12 +41,16 @@ Mandatory loop:
 6. rr_causal_heuristic {question} — because-clause → GLM odds-ratio on facts, dummy then live.
 7. rr_pearl {question} — backdoor identify + GLM + do() CASE, dummy then live. CASE is SELECT, not UPDATE.
 8. rr_analytics_primitives / rr_analytics_chain — atoms and named composites (max depth 24). Bound KPIs from spec/domain-*.json appear on rr_boot when those columns exist (e.g. gene FASTA cases_by_gene).
-9. rr_automine {question, passes} — mine → causal reflect → collect possible etiology evidence (heuristic, identification none) → splice cues/genes → pivot → re-cause → expand catalogued follow-ons. Then drafts a citation-grounded report (planner → researcher → reporter → validator). Evidence, not conclusive proof. Never SQL.
-9b. rr_report — after automine, draft or reload the report. Citations are RelOp pairs, catalog NCBI/UniProt accessions, and bound KPI rows only. Local SLM or cloud API if present; otherwise a deterministic draft. Never invent papers.
-9c. rr_kpi {kpi} — run a bound domain KPI (dummy then live). rr_gene — write the public FASTA pineoblastoma sample.
+9. rr_automine {question, passes, domain?} — detect the domain from the schema (gene, finance) → recall remembered evidence → causal reflect → gate the pass (supported / review_required / refused / failed) → collect possible-cause evidence (heuristic, identification none) → remember it in the vector overlay → splice cues/candidates → pivot → re-cause → expand catalogued follow-ons. Reuses a finished run by key. Then drafts a citation-grounded report (planner → researcher → reporter → validator). Evidence, not conclusive proof. Never SQL.
+9b. rr_report — after automine, draft or reload the report. Citations are RelOp pairs, catalog accessions/tickers, and bound KPI rows only. Local SLM or cloud API if present; otherwise a deterministic draft. Never invent papers.
+9c. rr_kpi {kpi} — run a bound domain KPI (dummy then live). rr_gene — write the public FASTA pineoblastoma sample. rr_finance — write the equities price-move sample (yfinance or baked). rr_recall {query} — knn over remembered automine evidence.
+9d. rr_autonomy {objective, generations} — autonomy loop on atomic relations (spec/autonomy.json). Seeds chains of atoms from the bound goal, grammar-checks each, rolls legal ones out on the dummy, scores against the goal, mutates one atom at a time (swap bind, add restrict/cut/compare, drop, splice), keeps winners in .revolverelate/autonomy.json, replays the winner live. Score is a search heuristic. Never SQL.
+9e. rr_hypothesize {rounds} (or rr_autonomy with no objective) — the engine acts on its own (spec/hypotheses.json). It surveys the booted schema, forms testable hypotheses over bound columns (concentration, contrast, association, correlation, trend), tests each as a RelOp chain — dummy ticket first, verdict from live rows — derives follow-ups from supported results (drill into the winning slice, try to refute by generalising to peers), remembers every test in .revolverelate/hypotheses.json and the evidence overlay, then searches from the strongest supported hypothesis. Verdicts are threshold comparisons on live rows, uncorrected for multiple comparisons. Not causes. Never SQL.
 10. rr_promote only if you have a RelOp IR that already has a sandbox ticket (rr_question already replays live).
 
 Gene / FASTA example: write a public NCBI protein sample (`python -m revolverelate gene`), rr_boot that sqlite, then rr_question "what causes pinealblastoma" (alias of pineoblastoma). RelOp binds Abstract/Cases/Symbol from the gene schema. Overlay chunks FASTA headers plus abstracts that contain because/therefore. This is bound retrieve + KPI, not a claim the engine discovered etiology.
+
+Finance example: rr_finance (yfinance daily bars when installed, baked otherwise), rr_boot that sqlite, then rr_question "what causes AAPL price moves" or rr_automine. Moves are flagged from the bars (return z-score, volume ratio, gap, regime) and described with templated cue notes; automine pairs them per ticker as possible-driver evidence and expands catalogued sector peers. Not a forecast, not investment advice.
 
 If the user gives a DSN and a question in one turn, call rr_question with both.
 """
@@ -773,8 +777,42 @@ def tool_gene(args: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def tool_finance(args: dict[str, Any]) -> dict[str, Any]:
+    from revolverelate.domain.finance import write_finance_equities
+
+    dest = Path(str(args.get("dest") or _workdir(args) / "equities.sqlite"))
+    symbols = args.get("symbols")
+    if isinstance(symbols, str):
+        symbols = [s.strip() for s in symbols.split(",") if s.strip()]
+    path = write_finance_equities(
+        dest,
+        symbols=list(symbols) if symbols else None,
+        period=str(args["period"]) if args.get("period") else None,
+        use_yfinance=not bool(args.get("offline")),
+    )
+    return {
+        "mode": "finance",
+        "path": str(path),
+        "hint": "Equities price-move sample (Ticker, PriceBar, PriceMove, MarketEvent). Source column says yfinance or baked. rr_boot this path, then rr_question 'what causes AAPL price moves' or rr_automine.",
+        "next": "rr_boot",
+        "honesty": "Cues are templated from measured bars. Not a forecast, not investment advice.",
+    }
+
+
+def tool_recall(args: dict[str, Any]) -> dict[str, Any]:
+    rr, err = _ensure_ready(args)
+    if err:
+        return err
+    assert rr is not None
+    query = str(args.get("query") or args.get("question") or "").strip()
+    if not query:
+        return {"error": "query is required"}
+    out = rr.recall(query, n=int(args.get("n") or 5), strategy=str(args.get("strategy") or "semantic"))
+    return {"mode": "recall", **out, "hint": "Remembered automine evidence, knn on the dummy overlay. Never a live table."}
+
+
 def tool_automine(args: dict[str, Any]) -> dict[str, Any]:
-    question = str(args.get("question") or args.get("query") or "what causes pinealblastoma").strip()
+    question = str(args.get("question") or args.get("query") or "").strip() or None
     rr, err = _ensure_ready(args)
     if err:
         return err
@@ -784,6 +822,8 @@ def tool_automine(args: dict[str, Any]) -> dict[str, Any]:
         question,
         passes=int(passes) if passes is not None else None,
         until_stable=None if args.get("untilStable") is None else bool(args.get("untilStable")),
+        domain=str(args["domain"]) if args.get("domain") else None,
+        rerun=bool(args.get("rerun")),
     )
     history = []
     for row in out.get("history") or []:
@@ -794,6 +834,9 @@ def tool_automine(args: dict[str, Any]) -> dict[str, Any]:
                 "nextQuestion": row.get("nextQuestion"),
                 "pivot": row.get("pivot"),
                 "splice": row.get("splice"),
+                "gate": row.get("gate"),
+                "recall": row.get("recall"),
+                "remembered": row.get("remembered"),
                 "etiologies": row.get("etiologies"),
                 "goal": row.get("goal"),
                 "proposed": row.get("proposed"),
@@ -806,11 +849,18 @@ def tool_automine(args: dict[str, Any]) -> dict[str, Any]:
     return {
         "mode": "automine",
         "kind": "automine",
+        "domain": out.get("domain"),
+        "evidenceKind": out.get("evidenceKind"),
+        "evidenceLabel": out.get("evidenceLabel"),
         "question": out.get("question"),
         "finalQuestion": out.get("finalQuestion"),
+        "reuseKey": out.get("reuseKey"),
+        "reused": bool(out.get("reused")),
         "passes": out.get("passes"),
         "stable": out.get("stable"),
         "stop": out.get("stop"),
+        "gate": out.get("gate"),
+        "memory": out.get("memory"),
         "goal": out.get("goal"),
         "identification": "none",
         "evidenceGrade": "heuristic",
@@ -822,7 +872,7 @@ def tool_automine(args: dict[str, Any]) -> dict[str, Any]:
         "history": history,
         "honesty": out.get("honesty"),
         "report": _report_view(out.get("report")),
-        "hint": "Possible etiology evidence from live RelOp pairs. Identification is none — not conclusive proof. Call rr_report to re-draft from the saved handoff.",
+        "hint": f"{str(out.get('evidenceLabel') or 'possible etiology').capitalize()} evidence from live RelOp pairs, gated per pass (supported / review_required / refused / failed). Identification is none — not conclusive proof. Call rr_report to re-draft, rr_recall to query evidence memory.",
     }
 
 
@@ -863,6 +913,104 @@ def tool_report(args: dict[str, Any]) -> dict[str, Any]:
         return {"error": "automine did not produce a report", "hint": "Call rr_automine first."}
     report = run_research(state, workdir=workdir)
     return {"mode": "report", **(_report_view(report) or {}), "question": state.get("question")}
+
+
+def _hypotheses_view(state: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "mode": "hypothesize",
+        "domain": state.get("domain"),
+        "survey": state.get("survey"),
+        "rounds": state.get("rounds"),
+        "formed": state.get("formed"),
+        "derived": state.get("derived"),
+        "counts": state.get("counts"),
+        "tested": [
+            {k: r.get(k) for k in ("round", "kind", "origin", "statement", "verdict", "grade", "effect", "why", "slice", "parent", "key")}
+            for r in (state.get("tested") or [])
+        ],
+        "supported": state.get("supported"),
+        "refuted": state.get("refuted"),
+        "peerNotes": state.get("peerNotes"),
+        "remembered": state.get("remembered"),
+        "previouslyTested": state.get("previouslyTested"),
+        "stop": state.get("stop"),
+        "search": state.get("search"),
+        "grade": state.get("grade"),
+        "memoryFile": ".revolverelate/hypotheses.json",
+        "honesty": state.get("honesty"),
+        "identification": "none",
+    }
+
+
+def tool_hypothesize(args: dict[str, Any]) -> dict[str, Any]:
+    rr, err = _ensure_ready(args)
+    if err:
+        return err
+    assert rr is not None
+    rounds = args.get("rounds")
+    per = args.get("perRound") or args.get("per_round")
+    live = True if args.get("live") is None else bool(args.get("live"))
+    search = args.get("search")
+    state = rr.hypothesize(
+        rounds=int(rounds) if rounds is not None else None,
+        per_round=int(per) if per is not None else None,
+        live=live,
+        retest=bool(args.get("retest")),
+        search=None if search is None else bool(search),
+        domain=str(args["domain"]) if args.get("domain") else None,
+        use_slm=True if args.get("slm") is None else bool(args.get("slm")),
+    )
+    return _hypotheses_view(state)
+
+
+def tool_autonomy(args: dict[str, Any]) -> dict[str, Any]:
+    objective = str(args.get("objective") or args.get("question") or args.get("query") or "").strip()
+    rr, err = _ensure_ready(args)
+    if err:
+        return err
+    assert rr is not None
+    if not objective:
+        rounds = args.get("rounds")
+        live = True if args.get("live") is None else bool(args.get("live"))
+        state = rr.autonomy(None, live=live, rounds=int(rounds) if rounds is not None else None, retest=bool(args.get("retest")))
+        return _hypotheses_view(state) | {"mode": "autonomy:self-directed"}
+    gens = args.get("generations")
+    pop = args.get("population")
+    live = True if args.get("live") is None else bool(args.get("live"))
+    state = rr.autonomy(
+        objective,
+        generations=int(gens) if gens is not None else None,
+        population=int(pop) if pop is not None else None,
+        live=live,
+        seed=int(args.get("seed") or 7),
+    )
+    winner = state.get("winner") or {}
+    return {
+        "mode": "autonomy",
+        "objective": objective,
+        "goal": state.get("goal"),
+        "generations": state.get("generations"),
+        "evaluated": state.get("evaluated"),
+        "legal": state.get("legal"),
+        "ran": state.get("ran"),
+        "illegalNeverRan": state.get("illegalNeverRan"),
+        "stop": state.get("stop"),
+        "best": state.get("best"),
+        "winner": {
+            "ops": winner.get("ops"),
+            "steps": winner.get("steps"),
+            "planId": winner.get("planId"),
+            "score": winner.get("score"),
+            "rowCount": winner.get("rowCount"),
+            "columns": winner.get("columns"),
+            "sample": winner.get("sample"),
+        },
+        "winners": state.get("winners"),
+        "live": _clip_live(state.get("live")),
+        "memoryFile": ".revolverelate/autonomy.json",
+        "honesty": state.get("honesty"),
+        "identification": "none",
+    }
 
 
 MCP_TOOLS: list[dict[str, Any]] = [
@@ -1169,14 +1317,31 @@ MCP_TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "rr_automine",
-        "description": "Mine, causal-reflect, splice live cues/genes into the next ask, pivot column/family, re-cause, expand catalogued follow-ons, then draft a citation-grounded report. Never SQL. Not a discovery claim.",
+        "description": "Detect the domain (gene, finance, …) from the booted schema, then loop: recall remembered evidence, causal-reflect, gate the pass (supported / review_required / refused / failed), collect possible-cause evidence, remember it in the vector overlay, splice live cues/candidates into the next ask, pivot, expand catalogued follow-ons, rebuild. Reuses a finished run by key. Then drafts a citation-grounded report. Never SQL. Not a discovery claim, not investment advice.",
         "inputSchema": {
             "type": "object",
             "properties": {
-                "question": {"type": "string"},
+                "question": {"type": "string", "description": "e.g. 'what causes pinealblastoma', 'what causes AAPL price moves' (default: the domain's defaultQuestion)"},
                 "query": {"type": "string"},
                 "passes": {"type": "integer", "description": "Max loop passes (default 3, hard max 8)"},
                 "untilStable": {"type": "boolean"},
+                "domain": {"type": "string", "description": "Force gene | finance instead of detecting"},
+                "rerun": {"type": "boolean", "description": "Ignore a saved run with the same reuse key"},
+                "dsn": _DSN,
+                "workdir": _WORKDIR,
+            },
+        },
+    },
+    {
+        "name": "rr_recall",
+        "description": "knn over evidence rows automine remembered in the dummy vector overlay (AutomineEvidence). Same RelOp knn as live text; never a live table.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string"},
+                "question": {"type": "string"},
+                "n": {"type": "integer"},
+                "strategy": {"type": "string", "enum": ["semantic", "causal"]},
                 "dsn": _DSN,
                 "workdir": _WORKDIR,
             },
@@ -1192,6 +1357,43 @@ MCP_TOOLS: list[dict[str, Any]] = [
                 "query": {"type": "string"},
                 "rerun": {"type": "boolean", "description": "Ignore saved automine.json and mine again"},
                 "passes": {"type": "integer"},
+                "dsn": _DSN,
+                "workdir": _WORKDIR,
+            },
+        },
+    },
+    {
+        "name": "rr_autonomy",
+        "description": "Autonomy loop on atomic relations. With an English objective: bind to measure/dimension/slice, seed chains of atoms, grammar-check, roll legal chains out on the dummy, score against the goal, mutate one atom at a time, keep winners, replay the winner live. With no objective the engine acts on its own: it forms hypotheses over the booted schema, tests them (dummy ticket, live verdict), derives follow-ups, then searches from the strongest supported hypothesis (same as rr_hypothesize). Score is a search heuristic, not truth. Never SQL.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "objective": {"type": "string", "description": "e.g. 'west sales by category', 'loss by segment', 'cases by gene'. Omit to run self-directed."},
+                "question": {"type": "string"},
+                "generations": {"type": "integer", "description": "Default 4, hard max 12"},
+                "population": {"type": "integer", "description": "Candidates per generation (default 6)"},
+                "rounds": {"type": "integer", "description": "Hypothesis rounds when self-directed (default 3)"},
+                "retest": {"type": "boolean", "description": "Self-directed: re-test remembered hypotheses"},
+                "seed": {"type": "integer"},
+                "live": {"type": "boolean", "description": "Replay the winner live (default true)"},
+                "dsn": _DSN,
+                "workdir": _WORKDIR,
+            },
+        },
+    },
+    {
+        "name": "rr_hypothesize",
+        "description": "Self-directed hypothesis loop (spec/hypotheses.json). Surveys the booted schema, forms testable hypotheses (concentration, contrast, association, correlation, trend) over bound columns, tests each as a RelOp chain — dummy ticket first, verdict from live rows — derives follow-ups from supported results (drill into the winning slice, try to refute by generalising to peers), remembers every test in .revolverelate/hypotheses.json and in the evidence overlay, then runs the atom search from the strongest supported hypothesis. Verdicts are threshold comparisons, uncorrected; identification is none. Never SQL.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "rounds": {"type": "integer", "description": "Default 3, hard max 6"},
+                "perRound": {"type": "integer", "description": "Hypotheses tested per round (default 8)"},
+                "retest": {"type": "boolean", "description": "Re-test remembered hypotheses (default false)"},
+                "search": {"type": "boolean", "description": "Run the atom search after supported hypotheses (default true)"},
+                "live": {"type": "boolean", "description": "Replay live for verdicts (default true). false grades every verdict dummy_only."},
+                "slm": {"type": "boolean", "description": "Let an SLM propose extra bound hypotheses (default true when one is configured)"},
+                "domain": {"type": "string", "description": "Prefer a domain (gene, finance) when several match"},
                 "dsn": _DSN,
                 "workdir": _WORKDIR,
             },
@@ -1219,6 +1421,20 @@ MCP_TOOLS: list[dict[str, Any]] = [
             "type": "object",
             "properties": {
                 "dest": {"type": "string"},
+                "workdir": _WORKDIR,
+            },
+        },
+    },
+    {
+        "name": "rr_finance",
+        "description": "Write the equities price-move sqlite sample: yfinance daily bars when installed (pip install revolverelate[finance]), baked seeded bars otherwise. Flags large moves from the bars (return z-score, volume ratio, gap, regime) with templated cue notes. Not a forecast, not investment advice.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "dest": {"type": "string"},
+                "symbols": {"type": "array", "items": {"type": "string"}, "description": "Default: spec/domain-finance.json universe"},
+                "period": {"type": "string", "description": "yfinance period, e.g. 6mo, 1y"},
+                "offline": {"type": "boolean", "description": "Skip yfinance and bake"},
                 "workdir": _WORKDIR,
             },
         },
@@ -1255,8 +1471,12 @@ _DISPATCH = {
     "rr_chroma": tool_chroma,
     "rr_automine": tool_automine,
     "rr_report": tool_report,
+    "rr_autonomy": tool_autonomy,
+    "rr_hypothesize": tool_hypothesize,
     "rr_kpi": tool_kpi,
     "rr_gene": tool_gene,
+    "rr_finance": tool_finance,
+    "rr_recall": tool_recall,
 }
 
 
@@ -1429,6 +1649,23 @@ def list_prompts() -> list[dict[str, Any]]:
             ],
         },
         {
+            "name": "rr_autonomy",
+            "description": "Autonomy loop on atomic relations: seed, check, dummy rollout, score, mutate, replay the winner.",
+            "arguments": [
+                {"name": "dsn", "description": "Catalogued DSN / sqlite", "required": False},
+                {"name": "objective", "description": "Goal in English (omit to run self-directed)", "required": False},
+                {"name": "generations", "description": "Max generations (default 4)", "required": False},
+            ],
+        },
+        {
+            "name": "rr_hypothesize",
+            "description": "Self-directed: form hypotheses over the booted schema, test them live after a dummy ticket, derive follow-ups, remember.",
+            "arguments": [
+                {"name": "dsn", "description": "Catalogued DSN / sqlite", "required": False},
+                {"name": "rounds", "description": "Rounds (default 3)", "required": False},
+            ],
+        },
+        {
             "name": "rr_report",
             "description": "Draft a citation-grounded report from automine findings (local SLM or cloud API).",
             "arguments": [
@@ -1458,6 +1695,12 @@ def get_prompt(name: str, arguments: dict[str, Any] | None = None) -> dict[str, 
         text += "\nCall rr_automine. RelOp reflect, expand only spec follow-ons, rebuild, mine again, then draft the cited report. Do not write SQL."
     if name == "rr_report":
         text += "\nCall rr_report after rr_automine. Cite only RelOp / catalog / KPI cards. Do not invent papers or SQL."
+    if name == "rr_autonomy":
+        text += "\nCall rr_autonomy with the objective, or without one to let the engine form and test its own hypotheses first. The loop proposes atoms; the grammar and the dummy decide. Do not write SQL or add atoms outside the spec."
+    if name == "rr_hypothesize":
+        text += "\nCall rr_hypothesize. The engine surveys, forms, tests, derives, and remembers on its own. Report verdicts as threshold comparisons on live rows — not causes. Do not write SQL."
+    if args.get("objective"):
+        text += f"\nObjective: {args['objective']}"
     if args.get("dsn"):
         text += f"\n\nDSN: {args['dsn']}"
     if args.get("question"):

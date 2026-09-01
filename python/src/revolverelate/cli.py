@@ -136,12 +136,27 @@ def main(argv: list[str] | None = None) -> int:
     p_gene = sub.add_parser("gene", help="Write a public NCBI FASTA / pineoblastoma gene SQLite sample")
     p_gene.add_argument("--dest", default=None, help="Output .sqlite path")
 
-    p_am = sub.add_parser("automine", help="Mine a corpus, RelOp-reflect, expand catalogued follow-ons, mine again")
-    p_am.add_argument("--dsn", default=None, help="Live corpus sqlite / DSN (default: write gene.sqlite)")
-    p_am.add_argument("--question", default="what causes pinealblastoma")
+    p_fin = sub.add_parser("finance", help="Write an equities price-move SQLite sample (yfinance when installed, baked bars otherwise)")
+    p_fin.add_argument("--dest", default=None, help="Output .sqlite path")
+    p_fin.add_argument("--symbols", default=None, help="Comma-separated tickers (default: spec/domain-finance.json universe)")
+    p_fin.add_argument("--period", default=None, help="yfinance period, e.g. 6mo, 1y, 2y")
+    p_fin.add_argument("--offline", action="store_true", help="Skip yfinance and bake a seeded series")
+
+    p_am = sub.add_parser("automine", help="Detect domain, RelOp-reflect, gate, remember evidence, expand catalogued follow-ons, mine again")
+    p_am.add_argument("--dsn", default=None, help="Live corpus sqlite / DSN (default: write the domain sample)")
+    p_am.add_argument("--question", default=None, help="Default: the detected domain's defaultQuestion")
     p_am.add_argument("--passes", type=int, default=3)
-    p_am.add_argument("--dest", default=None, help="When --dsn is omitted, write the gene sample here")
+    p_am.add_argument("--domain", default=None, help="gene | finance (default: detect from the schema; when --dsn is omitted this picks the sample)")
+    p_am.add_argument("--dest", default=None, help="When --dsn is omitted, write the domain sample here")
+    p_am.add_argument("--offline", action="store_true", help="Finance sample: skip yfinance")
+    p_am.add_argument("--rerun", action="store_true", help="Ignore a saved automine.json with the same reuse key")
     p_am.add_argument("--no-report", action="store_true", help="Skip the citation-grounded report after automine")
+
+    p_rec = sub.add_parser("recall", help="knn over remembered automine evidence chunks (dummy overlay memory)")
+    p_rec.add_argument("--dsn", required=True)
+    p_rec.add_argument("--query", required=True)
+    p_rec.add_argument("--n", type=int, default=5)
+    p_rec.add_argument("--strategy", default="semantic", choices=["semantic", "causal"])
 
     p_rep = sub.add_parser("report", help="Draft a citation-grounded report from automine findings (local SLM or cloud API)")
     p_rep.add_argument("--dsn", default=None, help="Live corpus sqlite / DSN when automine has not been saved yet")
@@ -150,15 +165,39 @@ def main(argv: list[str] | None = None) -> int:
     p_rep.add_argument("--dest", default=None, help="When --dsn is omitted, write the gene sample here")
     p_rep.add_argument("--markdown", action="store_true", help="Print report.md instead of JSON")
 
+    p_auto = sub.add_parser("autonomy", help="Autonomy loop on atomic relations: seed, check, dummy rollout, score, mutate, replay the winner")
+    p_auto.add_argument("--dsn", default=None, help="Live sqlite / DSN (default: write superstore.sqlite)")
+    p_auto.add_argument("--objective", default=None, help="Goal in English. Omit (or pass --self) to let the engine form and test its own hypotheses first")
+    p_auto.add_argument("--self", dest="self_directed", action="store_true", help="Self-directed: hypothesize, test, then search from the strongest supported hypothesis")
+    p_auto.add_argument("--generations", type=int, default=None)
+    p_auto.add_argument("--population", type=int, default=None)
+    p_auto.add_argument("--rounds", type=int, default=None, help="Hypothesis rounds when self-directed (default 3)")
+    p_auto.add_argument("--retest", action="store_true", help="Re-test hypotheses already in .revolverelate/hypotheses.json")
+    p_auto.add_argument("--seed", type=int, default=7)
+    p_auto.add_argument("--no-live", action="store_true", help="Do not replay the winner live")
+    p_auto.add_argument("--dest", default=None, help="When --dsn is omitted, write the Superstore sample here")
+
+    p_hyp = sub.add_parser("hypothesize", help="Self-directed hypothesis loop: survey the schema, form hypotheses, test (dummy ticket, live verdict), derive follow-ups, remember")
+    p_hyp.add_argument("--dsn", default=None, help="Live sqlite / DSN (default: write superstore.sqlite; --domain finance writes the equities sample)")
+    p_hyp.add_argument("--domain", default=None, help="Prefer a domain (gene, finance) when several match")
+    p_hyp.add_argument("--rounds", type=int, default=None, help="Rounds (default 3, hard max 6)")
+    p_hyp.add_argument("--per-round", type=int, default=None, help="Hypotheses tested per round (default 8)")
+    p_hyp.add_argument("--retest", action="store_true", help="Re-test remembered hypotheses")
+    p_hyp.add_argument("--no-search", action="store_true", help="Skip the atom search after supported hypotheses")
+    p_hyp.add_argument("--no-live", action="store_true", help="Dummy only: verdicts are graded dummy_only and do not count as evidence")
+    p_hyp.add_argument("--no-slm", action="store_true", help="Do not ask an SLM for extra bound hypotheses")
+    p_hyp.add_argument("--dest", default=None, help="When --dsn is omitted, write the sample here")
+    p_hyp.add_argument("--brief", action="store_true", help="Print one line per hypothesis instead of JSON")
+
     p_ex = sub.add_parser("example", help="Run the Superstore live walkthrough (connect, build, ask, promote)")
     p_ex.add_argument("--dest", default=None, help="Live Superstore sqlite path")
 
     p_exa = sub.add_parser("example-analytics", help="Run Superstore analytics recipes: scaffold → sandbox → live")
     p_exa.add_argument("--dest", default=None, help="Live Superstore sqlite path")
 
-    p_tut = sub.add_parser("tutorial", help="Walk Superstore facts, overlay RAG chunks, then gene automine + report")
+    p_tut = sub.add_parser("tutorial", help="Walk Superstore facts, overlay RAG chunks, gene automine + report, then finance price moves")
     p_tut.add_argument("--root", default="tutorial-run", help="Directory for sqlite files and .revolverelate caches")
-    p_tut.add_argument("--skip", action="append", default=[], help="Skip a part: superstore, rag, or automine (repeatable)")
+    p_tut.add_argument("--skip", action="append", default=[], help="Skip a part: superstore, rag, automine, or finance (repeatable)")
     p_tut.add_argument("--passes", type=int, default=3, help="Automine passes (default 3)")
     p_tut.add_argument("--json", action="store_true", help="Print tutorial.json instead of the narrated walkthrough")
 
@@ -298,19 +337,48 @@ def main(argv: list[str] | None = None) -> int:
         path = write_gene_pineal(dest)
         print(path)
         return 0
-    if args.cmd == "automine":
-        from revolverelate.domain.gene import write_gene_pineal
+    if args.cmd == "finance":
+        from revolverelate.domain.finance import write_finance_equities
 
+        dest = Path(args.dest) if args.dest else workdir / "equities.sqlite"
+        symbols = [s.strip() for s in args.symbols.split(",") if s.strip()] if args.symbols else None
+        path = write_finance_equities(dest, symbols=symbols, period=args.period, use_yfinance=not args.offline)
+        print(path)
+        return 0
+    if args.cmd == "automine":
         dsn = args.dsn
         if not dsn:
-            dest = Path(args.dest) if args.dest else workdir / "gene.sqlite"
-            dsn = str(write_gene_pineal(dest))
+            if (args.domain or "gene").casefold() == "finance":
+                from revolverelate.domain.finance import write_finance_equities
+
+                dest = Path(args.dest) if args.dest else workdir / "equities.sqlite"
+                dsn = str(write_finance_equities(dest, use_yfinance=not args.offline))
+            else:
+                from revolverelate.domain.gene import write_gene_pineal
+
+                dest = Path(args.dest) if args.dest else workdir / "gene.sqlite"
+                dsn = str(write_gene_pineal(dest))
         rr = RevolveRelate.connect(dsn, workdir=workdir)
         if not rr.cache.is_complete():
             rr.build()
-        state = rr.automine(args.question, passes=args.passes, report=not args.no_report)
+        state = rr.automine(
+            args.question,
+            passes=args.passes,
+            report=not args.no_report,
+            domain=args.domain,
+            rerun=args.rerun,
+        )
         print(json.dumps(state, indent=2, default=str))
         rr.close()
+        return 0
+    if args.cmd == "recall":
+        rr = RevolveRelate.connect(args.dsn, workdir=workdir)
+        try:
+            if not rr.cache.is_complete():
+                rr.build()
+            print(json.dumps(rr.recall(args.query, n=args.n, strategy=args.strategy), indent=2, default=str))
+        finally:
+            rr.close()
         return 0
     if args.cmd == "report":
         from revolverelate.domain.gene import write_gene_pineal
@@ -336,6 +404,71 @@ def main(argv: list[str] | None = None) -> int:
         else:
             print(json.dumps(report, indent=2, default=str))
         return 0
+    if args.cmd == "autonomy":
+        from revolverelate.samples.superstore import write_superstore
+
+        dsn = args.dsn
+        if not dsn:
+            dest = Path(args.dest) if args.dest else workdir / "superstore.sqlite"
+            dsn = str(write_superstore(dest))
+        rr = RevolveRelate.connect(dsn, workdir=workdir)
+        try:
+            state = rr.autonomy(
+                None if args.self_directed else args.objective,
+                generations=args.generations,
+                population=args.population,
+                live=not args.no_live,
+                seed=args.seed,
+                rounds=args.rounds,
+                retest=args.retest,
+            )
+        finally:
+            rr.close()
+        print(json.dumps(state, indent=2, default=str))
+        return 0
+    if args.cmd == "hypothesize":
+        dsn = args.dsn
+        if not dsn:
+            if (args.domain or "").casefold() == "finance":
+                from revolverelate.domain.finance import write_finance_equities
+
+                dest = Path(args.dest) if args.dest else workdir / "finance.sqlite"
+                dsn = str(write_finance_equities(dest, use_yfinance=False))
+            elif (args.domain or "").casefold() == "gene":
+                from revolverelate.domain.gene import write_gene_pineal
+
+                dest = Path(args.dest) if args.dest else workdir / "gene.sqlite"
+                dsn = str(write_gene_pineal(dest))
+            else:
+                from revolverelate.samples.superstore import write_superstore
+
+                dest = Path(args.dest) if args.dest else workdir / "superstore.sqlite"
+                dsn = str(write_superstore(dest))
+        rr = RevolveRelate.connect(dsn, workdir=workdir)
+        try:
+            state = rr.hypothesize(
+                rounds=args.rounds,
+                per_round=args.per_round,
+                live=not args.no_live,
+                retest=args.retest,
+                search=False if args.no_search else None,
+                domain=args.domain,
+                use_slm=not args.no_slm,
+            )
+        finally:
+            rr.close()
+        if args.brief:
+            print(f"domain={state.get('domain')} fact={state['survey']['fact']} formed={state['formed']} derived={state['derived']} tested={len(state['tested'])} stop={state['stop']}")
+            for row in state["tested"]:
+                print(f"  r{row['round']} {row['verdict']:<12} {row['origin']:<24} {row['statement']}  | {row['why']}")
+            for note in state.get("peerNotes") or []:
+                print(f"  note: {note}")
+            if state.get("search"):
+                print(f"  search: {state['search']}")
+            print(f"  {state['honesty']}")
+        else:
+            print(json.dumps(state, indent=2, default=str))
+        return 0
     if args.cmd == "analytics":
         return _analytics_cmd(args, workdir)
     if args.cmd == "example":
@@ -357,7 +490,7 @@ def main(argv: list[str] | None = None) -> int:
         from revolverelate.samples.tutorial import print_tutorial, run_tutorial
 
         skip = {str(s).casefold() for s in (args.skip or [])}
-        parts = tuple(p for p in ("superstore", "rag", "automine") if p not in skip)
+        parts = tuple(p for p in ("superstore", "rag", "automine", "finance") if p not in skip)
         report = run_tutorial(Path(args.root), parts=parts, passes=args.passes)
         if args.json:
             print(json.dumps(report, indent=2, default=str))

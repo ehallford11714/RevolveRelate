@@ -34,6 +34,10 @@ def handoff_from_automine(state: dict | None, spec: dict | None = None) -> dict:
         "mined": list(state.get("mined") or []),
         "passes": state.get("passes"),
         "stop": state.get("stop"),
+        "domain": str(state.get("domain") or "gene"),
+        "evidenceLabel": str(state.get("evidenceLabel") or "possible etiology"),
+        "candidateLabel": str(state.get("candidateLabel") or "gene"),
+        "gate": state.get("gate") if isinstance(state.get("gate"), dict) else None,
         "identification": "none",
         "evidenceGrade": "heuristic",
         "conclusive": False,
@@ -57,6 +61,17 @@ def _llm_json(prompt: str, system: str) -> dict | None:
         return None
 
 
+def _plural(label: str) -> str:
+    label = str(label or "").strip()
+    if not label:
+        return ""
+    if label.endswith("y") and not label.endswith("ey"):
+        return label[:-1] + "ies"
+    if label.endswith("s"):
+        return label
+    return label + "s"
+
+
 def plan_sections(handoff: dict, spec: dict) -> dict:
     """Planner: spec sections, optional SLM focus that cannot add candidates."""
     base = []
@@ -76,7 +91,7 @@ def plan_sections(handoff: dict, spec: dict) -> dict:
     planned = _llm_json(
         (
             "Create a research-section plan from this automine handoff. "
-            "Do not add gene symbols or claims that are not in candidates. "
+            f"Do not add {handoff.get('candidateLabel') or 'candidate'} symbols or claims that are not in candidates. "
             "Identification is none. Not proof.\n"
             f"{json.dumps({k: handoff[k] for k in ('question', 'candidates', 'mined', 'honesty') if k in handoff})}\n"
             f"Sections: {json.dumps([{'id': s['id'], 'title': s['title']} for s in base])}\n"
@@ -84,9 +99,11 @@ def plan_sections(handoff: dict, spec: dict) -> dict:
         ),
         "You are the planner agent. Return JSON only. Never write SQL. Never invent sources.",
     )
-    title = f"Possible etiologies: {handoff.get('question') or 'pipeline findings'}"
+    label = str(handoff.get("evidenceLabel") or "possible etiology")
+    cand_label = str(handoff.get("candidateLabel") or "gene")
+    title = f"{_plural(label).capitalize()}: {handoff.get('question') or 'pipeline findings'}"
     questions = [
-        f"Which catalogued genes appear as possible etiologies for {handoff.get('question') or 'this question'}?",
+        f"Which catalogued {_plural(cand_label)} appear as {_plural(label)} for {handoff.get('question') or 'this question'}?",
         "What live RelOp spans support each candidate?",
         "What remains unidentified?",
     ]
@@ -139,10 +156,14 @@ def draft_deterministic(handoff: dict, citations: list[dict], plan: dict, spec: 
         ids = by_cand.get(name) or []
         return " ".join(f"[{i}]" for i in ids) if ids else ""
 
+    label = str(handoff.get("evidenceLabel") or "possible etiology")
+    cand_label = str(handoff.get("candidateLabel") or "gene")
+    gate = handoff.get("gate") if isinstance(handoff.get("gate"), dict) else {}
     abstract = (
-        f"This report drafts possible etiology evidence for **{question or 'the pipeline question'}**. "
+        f"This report drafts {label} evidence for **{question or 'the pipeline question'}**. "
         f"The automine RelOp loop bound {len(etiologies)} heuristic pair(s) and {len(cands)} candidate(s). "
-        f"Identification is **none**. This is not conclusive proof and not a discovery claim. {honesty}"
+        + (f"Gate verdict: **{gate.get('overall')}** (per pass: {', '.join(gate.get('perPass') or [])}). " if gate else "")
+        + f"Identification is **none**. This is not conclusive proof and not a discovery claim. {honesty}"
     )
     scope = (
         f"Question: {question or '(none)'}. "
@@ -189,13 +210,14 @@ def draft_deterministic(handoff: dict, citations: list[dict], plan: dict, spec: 
         kpi_md = "No bound KPI rows were attached to this handoff."
     limits = (
         "- Identification is **none**. Evidence grade is **heuristic**.\n"
-        "- Overlay discourse plus catalog symbols are possible etiologies, not proof of disease mechanism.\n"
+        f"- Overlay discourse plus catalog symbols are {_plural(label)}, not proof of mechanism.\n"
         "- Dummy sandbox never copies live critical/PII values. Live overlay is TEMP from live non-PII text.\n"
-        "- Follow-on genes are catalogued in spec, not discovered by the engine.\n"
+        f"- Follow-on {_plural(cand_label)} are catalogued in spec, not discovered by the engine.\n"
+        "- A `supported` gate means live pairs named a catalogued candidate; `review_required` and `refused` passes add no evidence.\n"
         "- SLM prose is discarded if it cites an unknown `[E#]`."
     )
     conclusions = (
-        f"The pipeline produced {len(cands)} possible etiology candidate(s)"
+        f"The pipeline produced {len(cands)} {label} candidate(s)"
         + (f" ({', '.join(cands)})" if cands else "")
         + f" with {len(citations)} citation card(s). "
         "Treat the list as exploratory evidence for the next RelOp or lab review. "
@@ -307,7 +329,7 @@ def compile_report(
 ) -> dict:
     return {
         "kind": "research_report",
-        "title": plan.get("report_title") or f"Possible etiologies: {handoff.get('question') or ''}",
+        "title": plan.get("report_title") or f"{_plural(str(handoff.get('evidenceLabel') or 'possible etiology')).capitalize()}: {handoff.get('question') or ''}",
         "style": spec.get("style") or "science",
         "citationFormat": spec.get("citationFormat") or "numeric",
         "question": handoff.get("question"),

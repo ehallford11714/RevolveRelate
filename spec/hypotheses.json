@@ -1,0 +1,87 @@
+{
+  "id": "hypotheses",
+  "title": "Self-directed hypothesis loop",
+  "description": "With no objective given, the engine surveys the booted schema, forms testable hypotheses about bound columns, tests each as a RelOp chain (dummy ticket first, verdict from live rows), derives new hypotheses from what it learned (drill into a supported slice, try to refute by generalising to peers), and remembers every test so nothing is re-run. A hypothesis is a descriptive statistical statement with a declared threshold. It is never a causal claim. The SLM may only propose bound names; it never writes SQL.",
+  "kind": "runner",
+  "loop": ["survey", "form", "prioritise", "check", "rollout", "verdict", "derive", "remember", "stop", "search"],
+  "budget": {
+    "rounds": 3,
+    "hardMaxRounds": 6,
+    "perRound": 8,
+    "hardMaxTests": 40,
+    "maxDimensions": 6,
+    "maxMeasures": 4,
+    "maxValuesPerDimension": 3,
+    "followUpsPerSupported": 3
+  },
+  "kinds": [
+    {
+      "id": "concentration",
+      "statement": "The leading {dimension} accounts for at least {p:.0%} of total {measure}.",
+      "chain": ["scan_fact", "win_share_total", "sort_value_desc", "limit"],
+      "threshold": {"p": 0.4},
+      "verdict": "share of the top row >= p"
+    },
+    {
+      "id": "contrast",
+      "statement": "{measure} for {dimension} = {value} is at least {ratio}x the peer mean across {dimension}.",
+      "chain": ["scan_fact", "agg_sum_by", "vs_peer"],
+      "threshold": {"ratio": 1.25},
+      "verdict": "value / peer >= ratio for the named row"
+    },
+    {
+      "id": "association",
+      "statement": "Average {measure} is at least {ratio}x higher where {treatment} is above its median.",
+      "chain": ["scan_fact", "median", "measure_above", "agg_avg"],
+      "threshold": {"ratio": 1.2},
+      "verdict": "avg(measure | treatment > median) / avg(measure) >= ratio"
+    },
+    {
+      "id": "correlation",
+      "statement": "{measure} and {measure2} are linearly associated (|r| >= {r}).",
+      "chain": ["scan_fact", "corr"],
+      "threshold": {"r": 0.3, "minPairs": 20},
+      "verdict": "Pearson r over the returned pairs; inconclusive below minPairs"
+    },
+    {
+      "id": "trend",
+      "statement": "Total {measure} in {year2} exceeds {year1} by at least {growth:.0%}.",
+      "chain": ["scan_fact", "period_year", "agg_sum"],
+      "threshold": {"growth": 0.1},
+      "verdict": "(sum year2 - sum year1) / |sum year1| >= growth"
+    }
+  ],
+  "derive": {
+    "onSupported": {
+      "concentration": ["drill", "contrast_top"],
+      "contrast": ["drill", "refute_peers"],
+      "association": ["drill_association"],
+      "correlation": ["drill_correlation"],
+      "trend": ["drill_trend"]
+    },
+    "drill": "Re-ask the same hypothesis inside the winning slice against another dimension.",
+    "refute_peers": "Ask the same contrast for a peer value. If the peer also passes, the original is less specific than it looked.",
+    "note": "Follow-ups are formed from results, not from templates alone. They are still descriptive statements."
+  },
+  "verdicts": ["supported", "refuted", "inconclusive", "illegal", "failed", "dummy_only"],
+  "verdictNote": "supported and refuted come from live rows after a dummy ticket. dummy_only means live replay was disabled, so the verdict is about masked sandbox rows and does not count as evidence. inconclusive means too few rows or a null denominator.",
+  "seeds": {
+    "fromDomain": true,
+    "fromAutomine": true,
+    "fromSlm": true,
+    "memoryFile": ".revolverelate/hypotheses.json",
+    "evidenceMemory": true
+  },
+  "search": {
+    "afterSupported": true,
+    "generations": 3,
+    "note": "The strongest supported hypothesis becomes the objective of the atom search in spec/autonomy.json, so the search is directed by evidence rather than by a typed goal."
+  },
+  "slm": {
+    "optional": true,
+    "may": ["propose extra hypotheses as JSON bound to existing measures, dimensions, and sample values"],
+    "neverSql": true,
+    "rejected": "any proposal naming a column that does not resolve"
+  },
+  "honesty": "Hypotheses are descriptive statements over bound columns with declared thresholds. Verdicts are threshold comparisons on live RelOp rows, uncorrected for multiple comparisons. Identification is none; nothing here is a causal claim, a forecast, or investment advice."
+}

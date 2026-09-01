@@ -1,4 +1,8 @@
-"""Possible etiology evidence from live RelOp pairs. Identification is none — not proof."""
+"""Possible-cause evidence from live RelOp pairs. Identification is none — not proof.
+
+Domain-neutral: the catalog, evidence kind (possible_etiology / possible_driver),
+and symbol entity come from the detected domain.
+"""
 
 from __future__ import annotations
 
@@ -12,8 +16,15 @@ def collect_etiologies(
     proposed: list[str] | None = None,
     added: list[str] | None = None,
     pass_no: int = 1,
+    catalog: dict | None = None,
+    kind: str = "possible_etiology",
+    label: str = "possible etiology",
+    symbol_entity: str = "Gene",
+    symbol_column: str = "Symbol",
+    gate: str | None = None,
+    driver_terms: dict[str, str] | None = None,
 ) -> list[dict]:
-    """One evidence row per catalog gene mentioned in a live cause/effect pair."""
+    """One evidence row per catalogued candidate mentioned in a live cause/effect pair."""
     live = (causal or {}).get("live") if isinstance(causal, dict) else {}
     rows = list((live or {}).get("rows") or [])
     cols = [str(c) for c in (live or {}).get("columns") or []]
@@ -25,7 +36,7 @@ def collect_etiologies(
             return fallback
         return str(row[pos] or "")
 
-    catalog = catalog_targets()
+    catalog = catalog if catalog is not None else catalog_targets()
     out: list[dict] = []
     seen: set[str] = set()
     for row in rows:
@@ -39,25 +50,28 @@ def collect_etiologies(
         hits = extract_targets(blob, known=set(), catalog=catalog)
         if not hits:
             continue
+        driver = _driver(blob, driver_terms)
         for rec in hits:
             symbol = str(rec.get("symbol") or "")
-            key = f"{symbol.casefold()}|{cue.casefold()}|{pk}"
+            key = f"{symbol.casefold()}|{cue.casefold()}|{driver}|{pk}"
             if not symbol or key in seen:
                 continue
             seen.add(key)
             out.append(
                 {
                     "candidate": symbol,
-                    "kind": "possible_etiology",
+                    "kind": kind,
                     "identification": "none",
                     "evidenceGrade": "heuristic",
                     "conclusive": False,
                     "cue": _clip(cue, 24),
+                    "driver": driver,
                     "cause": _clip(cause),
                     "effect": _clip(effect),
                     "source": {"entity": entity, "column": column, "pk": pk},
                     "pass": pass_no,
-                    "note": "Bound overlay discourse + catalog gene. Possible etiology evidence, not conclusive proof.",
+                    "gate": gate,
+                    "note": f"Bound overlay discourse + catalogued candidate. {label.capitalize()} evidence, not conclusive proof.",
                 }
             )
     extra_blob = " ".join(list(proposed or []) + list(added or []))
@@ -69,28 +83,40 @@ def collect_etiologies(
         out.append(
             {
                 "candidate": symbol,
-                "kind": "possible_etiology",
+                "kind": kind,
                 "identification": "none",
                 "evidenceGrade": "heuristic",
                 "conclusive": False,
                 "cue": "catalog",
                 "cause": "",
                 "effect": "",
-                "source": {"entity": "Gene", "column": "Symbol", "pk": symbol},
+                "source": {"entity": symbol_entity, "column": symbol_column, "pk": symbol},
                 "pass": pass_no,
-                "note": "Catalog follow-on proposed from live text. Possible etiology evidence, not conclusive proof.",
+                "gate": gate,
+                "note": f"Catalog follow-on proposed from live text. {label.capitalize()} evidence, not conclusive proof.",
             }
         )
     return out
 
 
+def _driver(blob: str, terms: dict[str, str] | None) -> str:
+    """Label the measured driver named in a pair (e.g. volume / gap / regime / earnings). Domain-supplied terms."""
+    if not terms:
+        return ""
+    low = (blob or "").casefold()
+    for needle, label in terms.items():
+        if str(needle).casefold() in low:
+            return str(label)
+    return ""
+
+
 def merge_etiologies(*batches: list[dict]) -> list[dict]:
-    """Dedupe by candidate+cue, keep first (earlier pass) evidence."""
+    """Dedupe by candidate+cue(+driver), keep first (earlier pass) evidence."""
     seen: set[str] = set()
     out: list[dict] = []
     for batch in batches:
         for row in batch or []:
-            key = f"{str(row.get('candidate') or '').casefold()}|{str(row.get('cue') or '').casefold()}"
+            key = f"{str(row.get('candidate') or '').casefold()}|{str(row.get('cue') or '').casefold()}|{str(row.get('driver') or '').casefold()}"
             if key in seen:
                 continue
             seen.add(key)

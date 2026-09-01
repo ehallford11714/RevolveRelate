@@ -148,6 +148,52 @@ def run_automine_part(root: Path, *, passes: int = 3) -> dict:
         rr.close()
 
 
+def run_finance_part(root: Path, *, passes: int = 3, use_yfinance: bool = False) -> dict:
+    """Equities price moves: same automine loop on the finance domain. Offline by default so the walkthrough is deterministic."""
+    from revolverelate.domain.finance import write_finance_equities
+
+    live = write_finance_equities(root / "equities.sqlite", use_yfinance=use_yfinance)
+    workdir = root / "equities-run"
+    workdir.mkdir(parents=True, exist_ok=True)
+    rr = RevolveRelate.connect(str(live), workdir=workdir)
+    try:
+        if not rr.cache.is_complete():
+            rr.build(rows_per_entity=6)
+        source = {str(r[0]) for r in rr.adapter.execute("SELECT DISTINCT Source FROM Ticker")[1]}
+        state = rr.automine("what causes AAPL price moves", passes=passes)
+        report = state.get("report") or {}
+        drivers: dict[str, int] = {}
+        for row in state.get("etiologies") or []:
+            d = str(row.get("driver") or "")
+            if d:
+                drivers[d] = drivers.get(d, 0) + 1
+        recall = rr.recall("AAPL fell because volume ran", n=3)
+        return {
+            "part": "finance",
+            "live": str(live),
+            "workdir": str(workdir),
+            "source": sorted(source),
+            "domain": state.get("domain"),
+            "question": state.get("question"),
+            "passes": state.get("passes"),
+            "stop": state.get("stop"),
+            "gate": state.get("gate"),
+            "identification": state.get("identification"),
+            "conclusive": state.get("conclusive"),
+            "candidates": state.get("candidates"),
+            "drivers": drivers,
+            "mined": state.get("mined"),
+            "memory": state.get("memory"),
+            "recall": [r.get("text") for r in recall.get("rows") or []],
+            "reportTitle": report.get("title"),
+            "citationCount": len(report.get("citations") or []),
+            "reportPath": (report.get("paths") or {}).get("markdown"),
+            "honesty": state.get("honesty"),
+        }
+    finally:
+        rr.close()
+
+
 def run_tutorial(
     root: str | Path,
     *,
@@ -156,7 +202,7 @@ def run_tutorial(
 ) -> dict:
     dest = Path(root)
     dest.mkdir(parents=True, exist_ok=True)
-    wanted = parts if parts is not None else ("superstore", "rag", "automine")
+    wanted = parts if parts is not None else ("superstore", "rag", "automine", "finance")
     out: dict = {"kind": "tutorial", "root": str(dest), "parts": list(wanted)}
     if "superstore" in wanted:
         out["superstore"] = run_superstore_part(dest)
@@ -164,6 +210,8 @@ def run_tutorial(
         out["rag"] = run_rag_part(dest)
     if "automine" in wanted:
         out["automine"] = run_automine_part(dest, passes=passes)
+    if "finance" in wanted:
+        out["finance"] = run_finance_part(dest, passes=passes)
     (dest / "tutorial.json").write_text(json.dumps(out, indent=2, default=str), encoding="utf-8")
     return out
 
@@ -209,5 +257,23 @@ def print_tutorial(report: dict) -> None:
         if mine.get("reportPath"):
             print(f"   Markdown: {mine['reportPath']}")
         print(f"   {mine.get('honesty')}")
+        print()
+    fin = report.get("finance")
+    if fin:
+        print("3b. Finance (equity price moves as possible drivers, not a forecast)")
+        print(f"   Bars source: {', '.join(fin.get('source') or [])}  domain detected: {fin.get('domain')}")
+        print(f"   Question: {fin.get('question')}")
+        gate = fin.get("gate") or {}
+        print(f"   Passes: {fin.get('passes')}  stop: {fin.get('stop')}  gate: {gate.get('overall')} {gate.get('perPass')}")
+        drivers = ", ".join(f"{k} x{v}" for k, v in (fin.get("drivers") or {}).items())
+        print(f"   Drivers paired from move notes: {drivers or '(none)'}")
+        print(f"   Tickers with evidence: {', '.join(fin.get('candidates') or []) or '(none)'}")
+        print(f"   Catalogued peers loaded: {', '.join(fin.get('mined') or []) or '(none)'}")
+        mem = fin.get("memory") or {}
+        print(f"   Evidence memory: {mem.get('evidenceRows')} rows / {mem.get('chunks')} overlay chunks")
+        for text in (fin.get("recall") or [])[:2]:
+            print(f"     recall: {text}")
+        print(f"   Report: {fin.get('reportTitle')} ({fin.get('citationCount')} citations)")
+        print(f"   {fin.get('honesty')}")
         print()
     print(f"Saved {Path(report.get('root') or '.') / 'tutorial.json'}")

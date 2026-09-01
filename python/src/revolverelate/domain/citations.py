@@ -26,6 +26,13 @@ def load_research_spec() -> dict:
 
 def _urls_for(row: dict, sources: dict) -> dict[str, str]:
     out: dict[str, str] = {}
+    quote_tmpl = str(sources.get("yahooQuote") or "")
+    if quote_tmpl and row.get("symbol") and not row.get("ncbiGeneId") and not row.get("protein"):
+        out["quote"] = quote_tmpl.format(symbol=row["symbol"])
+        hist_tmpl = str(sources.get("yahooHistory") or "")
+        if hist_tmpl:
+            out["history"] = hist_tmpl.format(symbol=row["symbol"])
+        return out
     gene_id = str(row.get("ncbiGeneId") or "").strip()
     protein = str(row.get("protein") or "").strip()
     uniprot = str(row.get("uniprot") or "").strip()
@@ -49,9 +56,13 @@ def _next_id(n: int) -> str:
 def collect_citations(state: dict | None) -> list[dict]:
     """Build numeric [E#] cards from etiologies, catalog accessions, and KPI rows."""
     state = state if isinstance(state, dict) else {}
-    spec = domain_catalog()
+    domain_id = str(state.get("domain") or "gene")
+    spec = domain_catalog(domain_id) or domain_catalog()
     sources = spec.get("sources") if isinstance(spec.get("sources"), dict) else {}
     catalog = catalog_targets(spec)
+    auto = spec.get("automine") if isinstance(spec.get("automine"), dict) else {}
+    locator_base = str(auto.get("citationLocator") or f"spec/domain-{domain_id}.json")
+    cand_label = str(auto.get("candidateLabel") or "candidate")
     out: list[dict] = []
     seen: set[str] = set()
     n = 1
@@ -101,15 +112,16 @@ def collect_citations(state: dict | None) -> list[dict]:
         if not rec:
             continue
         protein = str(rec.get("protein") or "")
+        noun = "accession" if (protein or rec.get("ncbiGeneId")) else cand_label
         add(
             {
                 "key": f"catalog|{name.casefold()}",
                 "kind": "catalog_accession",
                 "candidate": str(rec.get("symbol") or name),
-                "title": f"Catalogued accession {rec.get('symbol') or name}"
-                + (f" ({protein})" if protein else ""),
-                "span": str(rec.get("evidence") or rec.get("summary") or rec.get("role") or ""),
-                "locator": f"spec/domain-gene.json#{rec.get('symbol') or name}",
+                "title": f"Catalogued {noun} {rec.get('symbol') or name}"
+                + (f" ({protein})" if protein else (f" ({rec.get('name')})" if rec.get("name") else "")),
+                "span": str(rec.get("evidence") or rec.get("summary") or rec.get("role") or rec.get("sector") or ""),
+                "locator": f"{locator_base}#{rec.get('symbol') or name}",
                 "urls": _urls_for(rec, sources),
                 "ncbiGeneId": str(rec.get("ncbiGeneId") or ""),
                 "protein": protein,
@@ -190,7 +202,7 @@ def format_reference(card: dict) -> str:
     urls = card.get("urls") if isinstance(card.get("urls"), dict) else {}
     url = ""
     if urls:
-        url = str(urls.get("ncbiGene") or urls.get("protein") or urls.get("uniprot") or urls.get("fasta") or "")
+        url = str(urls.get("ncbiGene") or urls.get("protein") or urls.get("uniprot") or urls.get("fasta") or urls.get("quote") or "")
     span = str(card.get("span") or "").strip()
     parts = [f"[{cid}] {title}."]
     if locator:

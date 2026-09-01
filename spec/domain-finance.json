@@ -1,0 +1,140 @@
+{
+  "id": "finance",
+  "title": "Equities price-move domain (yfinance)",
+  "description": "Daily OHLCV bars for a small public-equity universe. Large moves are flagged from the bars themselves (z-score of daily return, volume ratio, gap, trend regime) and described with templated cue text so the overlay can pair cause/effect. Automine collects possible driver evidence per ticker and expands catalogued sector peers. This is bound RelOp + heuristic search on measured bars — not a forecast, not investment advice, not a claim that the engine found why a price moved.",
+  "kind": "domain",
+  "sources": {
+    "yfinance": "pip install revolverelate[finance] — yfinance Ticker(symbol).history(period=...)",
+    "yahooQuote": "https://finance.yahoo.com/quote/{symbol}",
+    "yahooHistory": "https://finance.yahoo.com/quote/{symbol}/history",
+    "note": "Only daily bars and earnings dates are read. When yfinance or the network is unavailable the writer bakes a seeded series and records Source=baked on every row."
+  },
+  "inspiration": {
+    "kineteqV2": [
+      "Quant Finance Lab: yfinance history, technical scan, regime snapshot, cross-analysis",
+      "autocausal bridge: gate verdict supported / review_required / refused / failed on every run",
+      "CausalRun: reuse a prior run by task fingerprint instead of re-running"
+    ],
+    "notCopied": "Causal News panel asks an LLM to find news and assign Bayesian posteriors. Here every cue is templated from measured bars; no news is invented and no model writes SQL."
+  },
+  "universe": [
+    {"symbol": "AAPL", "name": "Apple Inc.", "sector": "Technology", "industry": "Consumer Electronics"},
+    {"symbol": "MSFT", "name": "Microsoft Corporation", "sector": "Technology", "industry": "Software"},
+    {"symbol": "NVDA", "name": "NVIDIA Corporation", "sector": "Technology", "industry": "Semiconductors"},
+    {"symbol": "JPM", "name": "JPMorgan Chase & Co.", "sector": "Financial Services", "industry": "Banks"},
+    {"symbol": "XOM", "name": "Exxon Mobil Corporation", "sector": "Energy", "industry": "Oil & Gas Integrated"}
+  ],
+  "followOn": [
+    {"symbol": "GOOGL", "name": "Alphabet Inc.", "sector": "Technology", "industry": "Internet Content", "summary": "Technology peer of AAPL and MSFT. Loaded on a later pass because a live peer list named it; therefore its moves can be compared."},
+    {"symbol": "AMD", "name": "Advanced Micro Devices", "sector": "Technology", "industry": "Semiconductors", "summary": "Semiconductor peer of NVDA. Loaded because the NVDA peer list named it; therefore sector-wide moves can be checked."},
+    {"symbol": "META", "name": "Meta Platforms", "sector": "Technology", "industry": "Internet Content", "summary": "Technology peer. Loaded because the peer list named it."},
+    {"symbol": "BAC", "name": "Bank of America", "sector": "Financial Services", "industry": "Banks", "summary": "Bank peer of JPM. Loaded because the JPM peer list named it; therefore rate-driven moves can be compared."},
+    {"symbol": "CVX", "name": "Chevron Corporation", "sector": "Energy", "industry": "Oil & Gas Integrated", "summary": "Energy peer of XOM. Loaded because the XOM peer list named it; therefore oil-driven moves can be compared."}
+  ],
+  "aliases": {
+    "apple": "AAPL",
+    "microsoft": "MSFT",
+    "nvidia": "NVDA",
+    "jpmorgan": "JPM",
+    "exxon": "XOM",
+    "alphabet": "GOOGL",
+    "google": "GOOGL"
+  },
+  "moves": {
+    "period": "1y",
+    "window": 20,
+    "zThreshold": 2.0,
+    "regimeWindow": 50,
+    "volumeSpike": 1.5,
+    "gapPct": 0.02,
+    "bakedDays": 260,
+    "note": "A move is a bar whose daily return z-score (rolling window) exceeds zThreshold. Regime is bull when close is above the regimeWindow mean, else bear."
+  },
+  "cues": {
+    "volume": "{symbol} {verb} {pct}% on {date} because volume ran {vr}x its {window}-day average; therefore this was a high-volume {direction} move in a {regime} regime.",
+    "gap": "{symbol} {verb} {pct}% on {date} because it gapped {gap}% at the open; therefore the move was set before regular trading in a {regime} regime.",
+    "regime": "{symbol} {verb} {pct}% on {date} during a {regime} regime; therefore the move ran with the {regimeWindow}-day trend.",
+    "event": "{symbol} {verb} {pct}% on {date}, the first session after a catalogued {kind}; therefore this move may be an {kind} reaction.",
+    "note": "Templates only restate measured bar facts (return, volume ratio, gap, regime, catalogued event date). 'because' and 'therefore' are discourse cues so chunk_causal can pair them. They are not causal claims."
+  },
+  "questions": [
+    "what causes AAPL price moves",
+    "what causes large moves in NVDA",
+    "which ticker had the biggest moves",
+    "moves by direction",
+    "volume ratio by regime"
+  ],
+  "kpis": [
+    {
+      "id": "abs_move_by_symbol",
+      "title": "Sum of absolute move returns by ticker",
+      "recipe": "sum_by_dimension",
+      "args": {"measure": "AbsReturn", "dimension": "Symbol"}
+    },
+    {
+      "id": "moves_by_symbol",
+      "title": "Count of flagged moves by ticker",
+      "recipe": "count_by_dimension",
+      "args": {"dimension": "Symbol"}
+    },
+    {
+      "id": "moves_by_direction",
+      "title": "Count of flagged moves up vs down",
+      "recipe": "count_by_dimension",
+      "args": {"dimension": "Direction"}
+    },
+    {
+      "id": "volume_ratio_by_regime",
+      "title": "Volume ratio summed by trend regime",
+      "recipe": "sum_by_dimension",
+      "args": {"measure": "VolumeRatio", "dimension": "Regime"}
+    },
+    {
+      "id": "share_of_moves",
+      "title": "Each ticker's share of absolute move return",
+      "recipe": "share_of_total",
+      "args": {"measure": "AbsReturn", "dimension": "Symbol"}
+    },
+    {
+      "id": "top_moves",
+      "title": "Largest single-day moves",
+      "recipe": "top_n",
+      "args": {"measure": "AbsReturn", "n": 8}
+    },
+    {
+      "id": "abs_move_by_sector",
+      "title": "Absolute move return by sector",
+      "recipe": "sum_by_dimension",
+      "args": {"measure": "AbsReturn", "dimension": "Sector"}
+    }
+  ],
+  "binds": {
+    "measure": "AbsReturn",
+    "treatment": "VolumeRatio",
+    "dimension": "Symbol",
+    "column": "Note"
+  },
+  "automine": {
+    "detect": ["Symbol", "Close", "AbsReturn", "Note"],
+    "symbolEntity": "Ticker",
+    "symbolColumn": "Symbol",
+    "kpi": "abs_move_by_symbol",
+    "scanEntities": ["Ticker", "PriceMove", "MarketEvent"],
+    "pivotColumns": ["Note", "Headline", "Peers"],
+    "families": ["spike", "trend", "reaction"],
+    "causalN": 400,
+    "causalNNote": "Wide enough to cover every causal chunk of the bound text column, so each flagged move can pair with its measured driver. The hash knn ranks near-identical effect chunks together; a narrow n would drop them all.",
+    "driverTerms": {
+      "earnings": "earnings reaction",
+      "gapped": "opening gap",
+      "volume ran": "volume spike",
+      "regime": "trend regime"
+    },
+    "evidenceKind": "possible_driver",
+    "evidenceLabel": "possible driver",
+    "candidateLabel": "ticker",
+    "defaultQuestion": "what causes AAPL price moves",
+    "citationLocator": "spec/domain-finance.json"
+  },
+  "honesty": "Price-move cues are templated from measured bars (return, volume ratio, gap, regime, catalogued event dates). Possible driver evidence is heuristic. Identification is none. Not a forecast, not investment advice."
+}

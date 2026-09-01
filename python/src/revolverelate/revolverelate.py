@@ -283,6 +283,11 @@ class RevolveRelate:
             raise SchemaError("causal() needs a complete build() cache")
         plan = fill_causal_plan(question, self.schema, self.policy)
         column = str((plan.get("goal") or {}).get("column") or column)
+        if n and n != 8:
+            # the caller widened the retrieve window (e.g. a domain's causalN); apply it to the knn atom
+            plan["steps"] = [
+                {**s, "n": int(n), "k": int(n)} if str(s.get("op")) == "knn" else s for s in plan.get("steps") or []
+            ]
         ran = self.analytics.run_chain(plan["steps"], plan_id="causal-plan")
         score = score_causal_rows(ran.get("columns"), ran.get("rows"))
         try:
@@ -351,13 +356,40 @@ class RevolveRelate:
         out["overlayPromoted"] = bool((out.get("live") or {}).get("ran"))
         return out
 
-    def automine(self, question: str, *, passes: int | None = None, until_stable: bool | None = None, live: bool = True, report: bool = True) -> dict:
-        """Mine corpus → RelOp reflect → expand catalogued follow-ons → rebuild → mine again."""
+    def automine(
+        self,
+        question: str | None = None,
+        *,
+        passes: int | None = None,
+        until_stable: bool | None = None,
+        live: bool = True,
+        report: bool = True,
+        domain: str | None = None,
+        rerun: bool = False,
+    ) -> dict:
+        """Detect domain → recall → RelOp reflect → gate → evidence → remember → expand → rebuild → again."""
         from revolverelate.domain.automine import run_automine
 
         if not self.cache.is_complete():
             self.build()
-        return run_automine(self, question, passes=passes, until_stable=until_stable, live=live, report=report)
+        return run_automine(
+            self,
+            question,
+            passes=passes,
+            until_stable=until_stable,
+            live=live,
+            report=report,
+            domain=domain,
+            rerun=rerun,
+        )
+
+    def recall(self, question: str, *, n: int = 5, strategy: str = "semantic") -> dict:
+        """knn over remembered automine evidence chunks (dummy overlay). Never a live table."""
+        from revolverelate.domain.evidence_store import recall_evidence
+
+        if not self.cache.is_complete():
+            raise SchemaError("recall() needs a complete build() cache")
+        return recall_evidence(self, question, n=n, strategy=strategy)
 
     def report(self, question: str | None = None, *, state: dict | None = None, use_slm: bool = True) -> dict:
         """Draft a citation-grounded report from automine findings (planner → researcher → reporter → validator)."""
@@ -373,6 +405,54 @@ class RevolveRelate:
             else:
                 raise SchemaError("report() needs automine state, a saved automine.json, or a question")
         return run_research(payload, workdir=self.workdir, use_slm=use_slm)
+
+    def autonomy(
+        self,
+        objective: str | None = None,
+        *,
+        generations: int | None = None,
+        population: int | None = None,
+        live: bool = True,
+        seed: int = 7,
+        rounds: int | None = None,
+        retest: bool = False,
+    ) -> dict:
+        """Autonomy loop on atoms: seed → check → dummy rollout → goal score → mutate → repeat → replay winner.
+
+        With no objective the engine acts on its own: it forms hypotheses over the booted schema, tests them
+        (dummy ticket, live verdict), derives follow-ups from what it learned, and only then runs the atom search
+        with the strongest supported hypothesis as the objective (spec/hypotheses.json).
+        """
+        from revolverelate.analytics.autonomy import run_autonomy
+
+        if not self.cache.is_complete():
+            self.build()
+        if not (objective or "").strip():
+            return self.hypothesize(rounds=rounds, live=live, retest=retest, search=True)
+        return run_autonomy(self, objective, generations=generations, population=population, live=live, seed=seed)
+
+    def hypothesize(
+        self,
+        *,
+        rounds: int | None = None,
+        per_round: int | None = None,
+        live: bool = True,
+        retest: bool = False,
+        search: bool | None = None,
+        domain: str | None = None,
+        use_slm: bool = True,
+    ) -> dict:
+        """Self-directed hypothesis loop: survey → form → test → derive → remember (spec/hypotheses.json).
+
+        Hypotheses are descriptive statements over bound columns with declared thresholds; verdicts come from live
+        RelOp rows after a dummy ticket. Tested hypotheses are remembered in .revolverelate/hypotheses.json and not
+        re-run unless retest=True. Identification is none. Never SQL.
+        """
+        from revolverelate.analytics.hypotheses import run_hypotheses
+
+        if not self.cache.is_complete():
+            self.build()
+        return run_hypotheses(self, rounds=rounds, per_round=per_round, live=live, retest=retest, search=search, domain=domain, use_slm=use_slm)
 
     def kpi(self, kpi_id: str, *, live: bool = True) -> dict:
         """Run a domain KPI recipe on dummy, then the same RelOp on live."""

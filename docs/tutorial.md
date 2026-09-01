@@ -251,6 +251,136 @@ rr_kpi       kpi=cases_by_gene
 
 A local SLM (Ollama) or `REVOLVERELATE_API_KEY` may rewrite report prose. Unknown `[E99]` citations are stripped. Without a model you still get a deterministic draft.
 
+### Gate, memory, reuse
+
+Every pass now carries a **gate verdict**, borrowed from the autocausal bridge in kineteq-ai-v2:
+
+| Verdict | Meaning |
+| --- | --- |
+| `supported` | live cue pairs named at least one catalogued candidate — still heuristic, identification still `none` |
+| `review_required` | live pairs exist but no catalogued candidate appears in them |
+| `refused` | no bound text column or no live pairs; nothing is paired, so nothing is invented |
+| `failed` | the RelOp raised |
+
+Evidence rows are also **remembered**: each becomes semantic + causal chunks in the dummy `OverlayChunk` under the virtual entity `AutomineEvidence`, so the next pass (and you) can knn-recall them with the same RelOp used for live text:
+
+```powershell
+python -m revolverelate recall --dsn .\gene.sqlite --query "DICER1 causes" --n 3
+```
+
+A finished run (`stop=goalReached`) is **reused** when the same domain + question comes back (`reuseKey`); pass `--rerun` to mine again.
+
+---
+
+## 3b. Finance — equities price moves as possible drivers
+
+Same loop, different domain. `spec/domain-finance.json` describes a small public universe (AAPL, MSFT, NVDA, JPM, XOM) plus catalogued sector peers. The writer pulls daily bars from **yfinance** when it is installed (`pip install -e "python[finance]"`); otherwise it bakes a seeded series and stamps `Source=baked` on every ticker, so the tutorial and tests run offline.
+
+```powershell
+python -m revolverelate finance --dest .\equities.sqlite            # add --offline to skip yfinance
+python -m revolverelate automine --dsn .\equities.sqlite --question "what causes AAPL price moves" --passes 3
+python -m revolverelate report --markdown
+```
+
+What the writer computes from the bars — nothing else:
+
+| Column | Meaning |
+| --- | --- |
+| `PriceMove.ZScore` | daily return z-score over a 20-bar window; a bar is a move when it passes `zThreshold` (2.0) |
+| `VolumeRatio` | volume over the 20-bar average |
+| `GapPct` | open vs prior close |
+| `Regime` | `bull` / `bear` from the 50-bar mean |
+| `Note` | a **templated** sentence: "AAPL fell 6.1% on … because volume ran 2.4x its 20-day average; therefore this was a high-volume down move in a bear regime." |
+| `MarketEvent` | yfinance earnings dates when available, otherwise catalogued quarterly stand-ins |
+
+The `because` / `therefore` in a `Note` are discourse cues so `chunk_causal` can pair the two halves. They restate measured facts; they are not a causal claim, and the report says so.
+
+Automine binds `AbsReturn` / `Symbol` / `Note` with a slice on `AAPL`, pairs every move note, and emits one evidence row per **ticker × driver** (`volume spike`, `opening gap`, `trend regime`, `earnings reaction`). Rows for the sliced ticker come first. Follow-ons are the peers each ticker names in its live `Peers` text — GOOGL, AMD, META, BAC, CVX — loaded only because `spec/domain-finance.json` catalogues them.
+
+What we took from kineteq-ai-v2's Quant Finance Lab: yfinance history, technical regime, sector cross-analysis, the gate verdicts, and reuse-by-task-key. What we did not take: its Causal News panel asks an LLM to find news and assign "Bayesian posteriors". No news is invented here and no model writes SQL. This is not a forecast and not investment advice.
+
+```text
+rr_finance   offline=true
+rr_boot      dsn=./equities.sqlite
+rr_question  question="what causes AAPL price moves"
+rr_automine  question="what causes AAPL price moves" passes=3
+rr_recall    query="AAPL fell because volume ran"
+rr_kpi       kpi=abs_move_by_symbol
+rr_report
+```
+
+---
+
+## 4. Autonomy loop — let the engine search atom chains
+
+Everything above picks from named recipes. The autonomy loop (`spec/autonomy.json`) works one level down, on the atoms in `spec/analytics-primitives.json`.
+
+Give it a goal in English. It binds a measure, a dimension, and an optional slice from the booted schema, then:
+
+1. **seeds** a few chains (`scan_fact → agg_sum_by → sort_value_desc → limit`, a share-of-total, a sliced sum, plus any named composite whose columns exist, plus winners from the last run);
+2. **checks** every chain with the composite grammar — an illegal chain never reaches the sandbox;
+3. **rolls out** legal chains on the dummy and gets a ticket for each;
+4. **scores** them against the goal (ran, row band, goal measure/dimension/slice bound, magnitude, novelty, minus depth);
+5. **keeps** the top three and **mutates** them one atom at a time — swap a measure or dimension bind, add a restrict / cut / compare, finish with order + cap, drop an atom, or splice two parents at their collapse;
+6. stops on target, patience, or the generation budget, then **replays the winner live** and writes `.revolverelate/autonomy.json`.
+
+```bash
+python -m revolverelate autonomy --objective "west sales by category" --dsn ./superstore.sqlite
+python -m revolverelate autonomy --objective "cases by gene" --dsn ./gene.sqlite --no-live
+```
+
+```python
+state = rr.autonomy("west sales by category", generations=4)
+state["winner"]["ops"]       # e.g. ['scan_fact', 'eq', 'agg_sum_by', 'sort_value_desc', 'limit']
+state["illegalNeverRan"]     # chains the grammar rejected before the sandbox
+state["live"]["rowCount"]    # the same RelOp replayed live
+```
+
+MCP: `rr_autonomy objective="west sales by category" generations=4`.
+
+The score is a search heuristic. A high score means "this RelOp is legal, ran on the dummy, and is bound to what you asked for" — nothing more. An SLM, if present, may only propose bind names; it cannot add atoms or write SQL.
+
+---
+
+## 5. Self-directed — let the engine form and test its own hypotheses
+
+Give it nothing. With no objective, `autonomy` switches to the hypothesis loop in `spec/hypotheses.json` (also available on its own as `hypothesize`). The engine:
+
+1. **surveys** the booted schema — fact table, measures, low-cardinality dimensions with sample values (keys, names, codes, and dates are never dimensions), a date column and its years, and the detected domain;
+2. **forms** hypotheses from five testable shapes, each a statement with a declared threshold:
+
+   | Kind | Statement | Test |
+   | --- | --- | --- |
+   | concentration | The leading *Category* accounts for at least 40% of total *Sales*. | `win_share_total`, top row's share, at least two groups |
+   | contrast | *Sales* for *Category = Furniture* is at least 1.25x the peer mean. | `agg_sum_by → vs_peer`, value / peer |
+   | association | Average *Sales* is at least 1.2x higher where *Quantity* is above its median. | `median`, then `measure_above → agg_avg` vs `agg_avg` |
+   | correlation | *AbsReturn* and *VolumeRatio* are linearly associated (\|r\| ≥ 0.3). | `corr` pairs → Pearson r, inconclusive under 20 pairs |
+   | trend | Total *Sales* in 2017 exceeds 2016 by at least 10%. | `period_year → agg_sum` for each year |
+
+   Extra seeds come from the autominer's catalogued candidates (each becomes a contrast hypothesis) and, if an SLM is configured, from proposals it makes as JSON bound to listed names only;
+3. **tests** each one as a RelOp chain — grammar check, dummy rollout for the ticket, then the **verdict from live rows**: `supported`, `refuted`, `inconclusive` (too few rows, absent value, null denominator), `illegal`, or `failed`. With `--no-live` every verdict is graded `dummy_only` and does not count as evidence;
+4. **derives** new hypotheses from what it learned — this is where novelty comes from. A supported concentration drills into the winning slice against the other dimensions and sharpens into a contrast on the top value; a supported contrast drills down and also tries to **refute itself** by asking the same contrast for peer values (if a peer passes too, the loop records that the finding was less specific than it looked); supported associations, correlations, and trends are re-asked inside slices;
+5. **remembers** every test in `.revolverelate/hypotheses.json` so a later run continues from where it stopped instead of re-testing, and writes supported findings into the evidence overlay so `recall` and the autominer can see them;
+6. **searches** — the strongest supported hypothesis becomes the objective of the atom search above, so the search is directed by evidence rather than by a typed goal.
+
+```bash
+python -m revolverelate hypothesize --dsn ./superstore.sqlite --brief
+python -m revolverelate hypothesize --domain finance --rounds 3 --brief
+python -m revolverelate autonomy --self --dsn ./equities.sqlite
+```
+
+```python
+state = rr.autonomy()                    # no objective → self-directed
+state["supported"][0]["statement"]       # e.g. 'AbsReturn and VolumeRatio are linearly associated (|r| >= 0.3).'
+state["tested"][8]["origin"]             # e.g. 'derive:refute_peers'
+state["peerNotes"]                       # findings a peer also passed
+state["search"]["objective"]             # the atom search this run launched
+```
+
+MCP: `rr_hypothesize rounds=3` or `rr_autonomy` with no objective.
+
+A verdict is a threshold comparison on live rows, uncorrected for multiple comparisons. "Supported" means the statement held on this data at this threshold — not that one column causes another. Identification stays none.
+
 ---
 
 ## Three rules that do not change
@@ -270,5 +400,7 @@ A local SLM (Ollama) or `REVOLVERELATE_API_KEY` may rewrite report prose. Unknow
 | [architecture.md](architecture.md) | Cache and promote gate |
 | `spec/vector-rag.json` | Chunk strategies and causal cues |
 | `spec/automine.json` | Mine loop and stop rules |
+| `spec/autonomy.json` | Atom-level search loop: seeds, mutations, score weights, stop |
+| `spec/hypotheses.json` | Self-directed loop: hypothesis kinds, thresholds, follow-up rules, verdicts |
 | `spec/deep-research.json` | Report agents and citation allow-list |
 | `spec/domain-gene.json` | Accessions, follow-ons, KPIs |

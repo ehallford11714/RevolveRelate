@@ -53,7 +53,53 @@ _MEASURE_HINTS = {
     "exposure",
     "associationscore",
     "lofcount",
+    "absreturn",
+    "return",
+    "zscore",
+    "volumeratio",
+    "gappct",
+    "close",
+    "volume",
 }
+
+_FINANCE_TOKENS = {
+    "price",
+    "prices",
+    "move",
+    "moves",
+    "ticker",
+    "tickers",
+    "stock",
+    "stocks",
+    "equity",
+    "equities",
+    "rally",
+    "selloff",
+    "drop",
+    "drawdown",
+    "volume",
+    "regime",
+}
+
+
+def _finance_symbols() -> dict[str, str]:
+    """Catalogued tickers + aliases from spec/domain-finance.json (lowercase → SYMBOL)."""
+    try:
+        import json
+
+        from revolverelate.catalog import spec_dir
+
+        spec = json.loads((spec_dir() / "domain-finance.json").read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    out: dict[str, str] = {}
+    for row in list(spec.get("universe") or []) + list(spec.get("followOn") or []):
+        sym = str(row.get("symbol") or "")
+        if sym:
+            out[sym.casefold()] = sym.upper()
+    for alias, sym in (spec.get("aliases") or {}).items():
+        out[str(alias).casefold()] = str(sym).upper()
+    return out
 
 _TEXT_HINTS = (
     "abstract",
@@ -270,7 +316,7 @@ def bind_analytics_goal(graph: SchemaGraph, question: str = "") -> dict:
     dims = list_dimensions(graph)
     measure = next((m for m in measures if m.casefold() in words), None)
     if measure is None:
-        prefer_ms = ("sales", "cases", "profit", "discount", "quantity", "exposure")
+        prefer_ms = ("sales", "cases", "absreturn", "profit", "discount", "quantity", "exposure")
         preferred = next((m for name in prefer_ms for m in measures if m.casefold() == name), None)
         if preferred is None:
             preferred = next((m for m in measures if m.casefold() in _MEASURE_HINTS), None)
@@ -284,6 +330,19 @@ def bind_analytics_goal(graph: SchemaGraph, question: str = "") -> dict:
         gene_dim = next((d for d in dims if d.replace("_", "").casefold() in {"symbol", "gene", "accession"}), None)
         if gene_dim:
             dimension = gene_dim
+    finance_syms = _finance_symbols() if (words & _FINANCE_TOKENS) or any(w in words for w in ("aapl", "msft", "nvda")) else {}
+    ticker_hit = None
+    if finance_syms:
+        import re as _re
+
+        ordered = [w for w in _re.findall(r"[a-z0-9]+", (question or "").casefold()) if w in finance_syms]
+        ticker_hit = finance_syms[ordered[0]] if ordered else None
+    finance_ctx = bool(words & _FINANCE_TOKENS or ticker_hit)
+    if finance_ctx:
+        sym_dim = next((d for d in dims if d.replace("_", "").casefold() == "symbol"), None)
+        texty = {"note", "headline", "peers", "name", "cue"}
+        if sym_dim and (dimension is None or dimension.replace("_", "").casefold() in texty):
+            dimension = sym_dim
     if dimension is None:
         prefer = ("category", "diseasename", "disease", "symbol", "cohort", "region", "segment")
         preferred = next((d for name in prefer for d in dims if d.replace("_", "").casefold() == name), None)
@@ -292,6 +351,12 @@ def bind_analytics_goal(graph: SchemaGraph, question: str = "") -> dict:
     if text_col is None and (words & _DISEASE_TOKENS):
         abstract = next((d for d in dims if d.replace("_", "").casefold() in {"abstract", "evidence", "summary"}), None)
         text_col = abstract
+    if finance_ctx and (text_col is None or text_col.replace("_", "").casefold() not in {"note", "headline"}):
+        for want in ("note", "headline"):
+            hit = next((d for d in dims if d.replace("_", "").casefold() == want), None)
+            if hit:
+                text_col = hit
+                break
     if text_col is None:
         text_col = pick_text_column(graph).attr_name
     if words & {"fasta", "sequence", "header"}:
@@ -303,7 +368,7 @@ def bind_analytics_goal(graph: SchemaGraph, question: str = "") -> dict:
         (
             m
             for m in treatments
-            if m.casefold() in words or m.casefold() in {"discount", "exposure", "dose", "lofcount", "associationscore"}
+            if m.casefold() in words or m.casefold() in {"discount", "exposure", "dose", "lofcount", "associationscore", "volumeratio"}
         ),
         None,
     )
@@ -323,6 +388,10 @@ def bind_analytics_goal(graph: SchemaGraph, question: str = "") -> dict:
         if region:
             value = next(w for w in ("west", "east", "south", "north", "central") if w in words)
             slice_ = {"column": region, "value": value.title() if value != "central" else "Central"}
+    if not slice_ and ticker_hit:
+        sym_dim = next((d for d in dims if d.replace("_", "").casefold() == "symbol"), None)
+        if sym_dim:
+            slice_ = {"column": sym_dim, "value": ticker_hit}
     return {
         "measure": measure,
         "dimension": dimension,
