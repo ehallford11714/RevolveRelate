@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://revolverelate.dev/spec/schema-graph.schema.json",
+  "title": "SchemaGraph",
+  "description": "Language-agnostic relational schema graph. Source of truth for both Python and TypeScript.",
+  "type": "object",
+  "required": ["engine", "entities", "relationships"],
+  "additionalProperties": false,
+  "properties": {
+    "engine": { "type": "string" },
+    "dialect": { "type": "string" },
+    "entities": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entity" }
+    },
+    "relationships": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/relationship" }
+    },
+    "domains": {
+      "type": "array",
+      "items": { "$ref": "primitives.schema.json#/$defs/domain" }
+    },
+    "constraints": {
+      "type": "array",
+      "items": { "$ref": "primitives.schema.json#/$defs/constraint" }
+    },
+    "indexes": {
+      "type": "array",
+      "items": { "$ref": "primitives.schema.json#/$defs/index" }
+    },
+    "notes": { "type": "array", "items": { "type": "string" } },
+    "annotations": { "type": "object" }
+  },
+  "$defs": {
+    "attribute": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "default": "TEXT" },
+        "nullable": { "type": "boolean", "default": true },
+        "primaryKey": { "type": "boolean", "default": false },
+        "unique": { "type": "boolean", "default": false },
+        "samples": { "type": "array", "items": { "type": "string" } },
+        "comment": { "type": "string" },
+        "sensitivity": {
+          "type": "string",
+          "enum": ["public", "internal", "critical", "pii"]
+        }
+      }
+    },
+    "entity": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "schema": { "type": "string", "default": "main" },
+        "kind": { "type": "string", "enum": ["table", "view", "cte"], "default": "table" },
+        "comment": { "type": "string" },
+        "attributes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/attribute" }
+        }
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "required": ["name", "from", "fromAttrs", "to", "toAttrs"],
+      "properties": {
+        "name": { "type": "string" },
+        "from": { "type": "string" },
+        "fromAttrs": { "type": "array", "items": { "type": "string" } },
+        "to": { "type": "string" },
+        "toAttrs": { "type": "array", "items": { "type": "string" } },
+        "kind": { "type": "string", "default": "foreign_key" },
+        "cardinality": { "type": "string", "default": "n:1" }
+      }
+    }
+  }
+}

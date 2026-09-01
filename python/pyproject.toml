@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "revolverelate"
+version = "0.1.0"
+description = "Language-agnostic NL → relational algebra compiler with a dummy sandbox and cached live promote."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "ehallford11714" }]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+demo = ["streamlit>=1.32"]
+chroma = [
+  "chromadb>=0.5.5",
+  "langchain-core>=0.3",
+  "langchain-chroma>=0.2",
+]
+postgres = ["psycopg[binary]>=3.1"]
+mysql = ["pymysql>=1.1"]
+snowflake = ["snowflake-connector-python>=3.0"]
+bigquery = ["google-cloud-bigquery>=3.0"]
+databricks = ["databricks-sql-connector>=3.0"]
+trino = ["trino>=0.329"]
+athena = ["pyathena>=3.0"]
+mssql = ["pyodbc>=5.0"]
+duckdb = ["duckdb>=1.0"]
+
+[project.scripts]
+revolverelate = "revolverelate.cli:main"
+revolverelate-mcp = "revolverelate.mcp.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

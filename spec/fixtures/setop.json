@@ -1,0 +1,39 @@
+{
+  "name": "setop",
+  "ir": {
+    "kind": "query",
+    "op": {
+      "op": "setop",
+      "set": "union",
+      "all": false,
+      "left": {
+        "op": "project",
+        "items": [{ "expr": { "expr": "col", "entity": "Customer", "attr": "CustomerId" }, "alias": "id" }],
+        "input": { "op": "scan", "entity": "Customer", "alias": "Customer" }
+      },
+      "right": {
+        "op": "project",
+        "items": [{ "expr": { "expr": "col", "entity": "Employee", "attr": "EmployeeId" }, "alias": "id" }],
+        "input": { "op": "scan", "entity": "Employee", "alias": "Employee" }
+      }
+    }
+  },
+  "sql": {
+    "postgres": "SELECT \"Customer\".\"CustomerId\" AS \"id\" FROM \"Customer\" AS \"Customer\" UNION SELECT \"Employee\".\"EmployeeId\" AS \"id\" FROM \"Employee\" AS \"Employee\"",
+    "sqlite": "SELECT \"Customer\".\"CustomerId\" AS \"id\" FROM \"Customer\" AS \"Customer\" UNION SELECT \"Employee\".\"EmployeeId\" AS \"id\" FROM \"Employee\" AS \"Employee\"",
+    "duckdb": "SELECT \"Customer\".\"CustomerId\" AS \"id\" FROM \"Customer\" AS \"Customer\" UNION SELECT \"Employee\".\"EmployeeId\" AS \"id\" FROM \"Employee\" AS \"Employee\"",
+    "mysql": "SELECT `Customer`.`CustomerId` AS `id` FROM `Customer` AS `Customer` UNION SELECT `Employee`.`EmployeeId` AS `id` FROM `Employee` AS `Employee`",
+    "tds": "SELECT [Customer].[CustomerId] AS [id] FROM [Customer] AS [Customer] UNION SELECT [Employee].[EmployeeId] AS [id] FROM [Employee] AS [Employee]",
+    "snowflake": "SELECT \"Customer\".\"CustomerId\" AS \"id\" FROM \"Customer\" AS \"Customer\" UNION SELECT \"Employee\".\"EmployeeId\" AS \"id\" FROM \"Employee\" AS \"Employee\"",
+    "bigquery": "SELECT `Customer`.`CustomerId` AS `id` FROM `Customer` AS `Customer` UNION DISTINCT SELECT `Employee`.`EmployeeId` AS `id` FROM `Employee` AS `Employee`"
+  },
+  "params": {
+    "postgres": [],
+    "sqlite": [],
+    "duckdb": [],
+    "mysql": [],
+    "tds": [],
+    "snowflake": [],
+    "bigquery": []
+  }
+}

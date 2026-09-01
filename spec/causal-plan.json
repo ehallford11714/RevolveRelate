@@ -1,0 +1,62 @@
+{
+  "title": "SLM CausalPlan",
+  "description": "The SLM plans a primitive chain. Never SQL, never Chroma filters, never CASE. Grammar check_chain rejects illegal thoughts. Fallback composites when the SLM is off.",
+  "kind": "causal_plan",
+  "allowedOps": [
+    "overlay",
+    "chunk_causal",
+    "knn",
+    "role_is",
+    "filter_cue",
+    "pair_causal",
+    "hypothesize",
+    "attach_source",
+    "attach_fact",
+    "intervene",
+    "vs_world",
+    "agg_sum_by",
+    "vs_peer",
+    "eq",
+    "scan_fact",
+    "star_join"
+  ],
+  "fallback": [
+    {
+      "id": "intervene",
+      "match": ["what if", "intervene", "zero", "stopped", "do("],
+      "composite": "causal_then_intervene"
+    },
+    {
+      "id": "pair",
+      "match": ["because", "therefore", "why", "cause", "causes", "caused", "effect", "pair", "disease", "pineoblastoma", "pinealblastoma", "gene"],
+      "composite": "rag_causal_pair"
+    },
+    {
+      "id": "agg",
+      "match": ["sales", "west", "category", "kpi"],
+      "composite": "causal_then_agg"
+    },
+    {
+      "id": "retrieve",
+      "match": [],
+      "composite": "rag_causal_knn"
+    }
+  ],
+  "abduce": {
+    "pattern": "causal_abduce",
+    "note": "The actuator enumerates these composites, runs each on the dummy, scores vs Goal, writes AskLog, keeps the winner. The SLM never ranks SQL.",
+    "candidates": [
+      "rag_causal_knn",
+      "rag_causal_pair",
+      "causal_then_agg",
+      "causal_then_intervene",
+      "intervene_west_discount"
+    ],
+    "score": {
+      "worldScale": 100,
+      "hintBonus": 2,
+      "memoryBonus": 1,
+      "goalBonus": 0.5
+    }
+  }
+}

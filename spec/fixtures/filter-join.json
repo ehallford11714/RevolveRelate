@@ -1,0 +1,58 @@
+{
+  "name": "filter-join",
+  "ir": {
+    "kind": "query",
+    "op": {
+      "op": "limit",
+      "count": 50,
+      "input": {
+        "op": "project",
+        "items": [
+          { "expr": { "expr": "col", "entity": "Invoice", "attr": "InvoiceId" }, "alias": "InvoiceId" },
+          { "expr": { "expr": "col", "entity": "Customer", "attr": "LastName" }, "alias": "LastName" }
+        ],
+        "input": {
+          "op": "filter",
+          "predicate": {
+            "expr": "bin",
+            "op": "=",
+            "left": { "expr": "col", "entity": "Customer", "attr": "Country" },
+            "right": { "expr": "lit", "value": "Canada" }
+          },
+          "input": {
+            "op": "join",
+            "joinType": "inner",
+            "left": { "op": "scan", "entity": "Invoice", "alias": "Invoice" },
+            "right": { "op": "scan", "entity": "Customer", "alias": "Customer" },
+            "on": [
+              {
+                "expr": "bin",
+                "op": "=",
+                "left": { "expr": "col", "entity": "Invoice", "attr": "CustomerId" },
+                "right": { "expr": "col", "entity": "Customer", "attr": "CustomerId" }
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "sql": {
+    "postgres": "SELECT \"Invoice\".\"InvoiceId\" AS \"InvoiceId\", \"Customer\".\"LastName\" AS \"LastName\" FROM \"Invoice\" AS \"Invoice\" INNER JOIN \"Customer\" AS \"Customer\" ON \"Invoice\".\"CustomerId\" = \"Customer\".\"CustomerId\" WHERE \"Customer\".\"Country\" = $1 LIMIT 50",
+    "sqlite": "SELECT \"Invoice\".\"InvoiceId\" AS \"InvoiceId\", \"Customer\".\"LastName\" AS \"LastName\" FROM \"Invoice\" AS \"Invoice\" INNER JOIN \"Customer\" AS \"Customer\" ON \"Invoice\".\"CustomerId\" = \"Customer\".\"CustomerId\" WHERE \"Customer\".\"Country\" = ? LIMIT 50",
+    "duckdb": "SELECT \"Invoice\".\"InvoiceId\" AS \"InvoiceId\", \"Customer\".\"LastName\" AS \"LastName\" FROM \"Invoice\" AS \"Invoice\" INNER JOIN \"Customer\" AS \"Customer\" ON \"Invoice\".\"CustomerId\" = \"Customer\".\"CustomerId\" WHERE \"Customer\".\"Country\" = ? LIMIT 50",
+    "mysql": "SELECT `Invoice`.`InvoiceId` AS `InvoiceId`, `Customer`.`LastName` AS `LastName` FROM `Invoice` AS `Invoice` INNER JOIN `Customer` AS `Customer` ON `Invoice`.`CustomerId` = `Customer`.`CustomerId` WHERE `Customer`.`Country` = ? LIMIT 50",
+    "tds": "SELECT TOP 50 [Invoice].[InvoiceId] AS [InvoiceId], [Customer].[LastName] AS [LastName] FROM [Invoice] AS [Invoice] INNER JOIN [Customer] AS [Customer] ON [Invoice].[CustomerId] = [Customer].[CustomerId] WHERE [Customer].[Country] = @p1",
+    "snowflake": "SELECT \"Invoice\".\"InvoiceId\" AS \"InvoiceId\", \"Customer\".\"LastName\" AS \"LastName\" FROM \"Invoice\" AS \"Invoice\" INNER JOIN \"Customer\" AS \"Customer\" ON \"Invoice\".\"CustomerId\" = \"Customer\".\"CustomerId\" WHERE \"Customer\".\"Country\" = ? LIMIT 50",
+    "bigquery": "SELECT `Invoice`.`InvoiceId` AS `InvoiceId`, `Customer`.`LastName` AS `LastName` FROM `Invoice` AS `Invoice` INNER JOIN `Customer` AS `Customer` ON `Invoice`.`CustomerId` = `Customer`.`CustomerId` WHERE `Customer`.`Country` = @p1 LIMIT 50"
+  },
+  "params": {
+    "postgres": ["Canada"],
+    "sqlite": ["Canada"],
+    "duckdb": ["Canada"],
+    "mysql": ["Canada"],
+    "tds": ["Canada"],
+    "snowflake": ["Canada"],
+    "bigquery": ["Canada"]
+  }
+}

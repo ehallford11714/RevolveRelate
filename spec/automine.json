@@ -1,0 +1,37 @@
+{
+  "id": "automine",
+  "title": "Corpus automine runner",
+  "description": "Mine a catalogued corpus, reflect with RelOps, collect possible etiology evidence (not proof), splice cues into the next ask, pivot, re-cause, expand follow-ons. Identification is none. The SLM never writes SQL.",
+  "kind": "runner",
+  "loop": ["mine", "ask", "reflect", "evidence", "splice", "pivot", "cause", "expand", "rebuild"],
+  "stop": {
+    "defaultPasses": 3,
+    "hardMaxPasses": 8,
+    "untilStable": true,
+    "stableWhen": ["goalReached", "noNewTargets"]
+  },
+  "reflect": {
+    "ask": true,
+    "causal": true,
+    "kpi": "cases_by_gene",
+    "scanEntities": ["Disease", "Gene", "GeneDisease"],
+    "extract": ["symbol", "accession"],
+    "pivotColumns": ["Abstract", "Evidence", "Summary", "Header"],
+    "families": ["gene", "epitope", "sirna"]
+  },
+  "expand": {
+    "maxNewPerPass": 2,
+    "catalog": "followOn"
+  },
+  "goal": {
+    "minLivePairs": 1,
+    "minSplicedTokens": 1,
+    "minEtiologies": 3,
+    "requireRespliceCausal": true,
+    "mineFollowOn": false,
+    "identification": "none",
+    "evidenceGrade": "heuristic",
+    "conclusive": false
+  },
+  "honesty": "Possible etiology evidence from bound RelOp pairs and catalogued genes. Identification is none. Not conclusive proof, not a discovery claim."
+}

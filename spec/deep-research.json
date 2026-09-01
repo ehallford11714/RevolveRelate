@@ -1,0 +1,100 @@
+{
+  "id": "deep-research",
+  "title": "Citation-grounded research report",
+  "description": "After automine, a planner / researcher / reporter / validator drafts a report from pipeline findings only. Citations must resolve to RelOp pairs, catalog accessions, or bound KPI rows. The SLM never writes SQL and never invents papers. Identification is none.",
+  "kind": "workflow",
+  "after": "automine",
+  "style": "science",
+  "citationFormat": "numeric",
+  "agents": [
+    {
+      "id": "planner",
+      "role": "Turn the automine handoff into a section plan. Do not add candidates that are not in the handoff."
+    },
+    {
+      "id": "researcher",
+      "role": "Collect citation cards from live RelOp pairs, spec/domain-*.json accessions, and bound KPI rows. No web invention."
+    },
+    {
+      "id": "reporter",
+      "role": "Draft section markdown. Cite only provided [E#] cards. Local SLM or cloud API if present; otherwise a deterministic draft."
+    },
+    {
+      "id": "validator",
+      "role": "Strip unknown citation ids, keep honesty banner, refuse conclusive-proof language. Discard SLM text that cites a missing source."
+    }
+  ],
+  "loop": ["handoff", "plan", "cite", "draft", "validate", "compile"],
+  "llm": {
+    "prefer": ["ollama", "openai_compat", "cloud"],
+    "optional": true,
+    "neverSql": true,
+    "neverInventSources": true
+  },
+  "sections": [
+    {
+      "id": "abstract",
+      "title": "Abstract",
+      "depth": 1,
+      "priority": 1
+    },
+    {
+      "id": "question_and_scope",
+      "title": "Question and scope",
+      "depth": 2,
+      "priority": 1
+    },
+    {
+      "id": "methodology",
+      "title": "Methodology",
+      "depth": 2,
+      "priority": 1
+    },
+    {
+      "id": "possible_etiologies",
+      "title": "Possible etiologies",
+      "depth": 3,
+      "priority": 1
+    },
+    {
+      "id": "evidence",
+      "title": "Evidence from bound RelOps",
+      "depth": 4,
+      "priority": 1
+    },
+    {
+      "id": "kpi_context",
+      "title": "Bound KPI context",
+      "depth": 2,
+      "priority": 2
+    },
+    {
+      "id": "limitations",
+      "title": "Limitations",
+      "depth": 2,
+      "priority": 1
+    },
+    {
+      "id": "conclusions",
+      "title": "Conclusions",
+      "depth": 2,
+      "priority": 1
+    },
+    {
+      "id": "references",
+      "title": "References",
+      "depth": 1,
+      "priority": 1
+    }
+  ],
+  "citationAllow": ["relop_pair", "catalog_accession", "kpi_row"],
+  "forbid": ["invented_paper", "web_hallucination", "unknown_source_id", "sql_from_slm"],
+  "honesty": "Possible etiology evidence from bound RelOp pairs, catalogued accessions, and KPI rows. Identification is none. Not conclusive proof, not a discovery claim, not medical advice.",
+  "goal": {
+    "identification": "none",
+    "evidenceGrade": "heuristic",
+    "conclusive": false,
+    "minCitations": 1,
+    "unknownCitations": 0
+  }
+}

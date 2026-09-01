@@ -1,0 +1,63 @@
+{
+  "title": "Objective, Socratic quest, ideation, and dummy worlds",
+  "description": "RelOp-only exploration. The SLM proposes binds. The grammar rejects illegal thoughts. The dummy sandbox picks a winner. Never SQL.",
+  "askLogEntity": "AskLog",
+  "sota": [
+    {"id": "ssr-2025", "title": "Socratic Self-Refine", "use": "Objective → explicit (sub-question, sub-answer) pairs. Here each pair is a named composite, executed on the dummy."},
+    {"id": "hyper-icde23", "title": "HypeR / HypDB what-if", "use": "Intervention is a query-time CASE rewrite, not a live UPDATE. vs_world compares observed vs intervened."},
+    {"id": "linx-2024", "title": "LINX goal-oriented ADE", "use": "Enumerate legal composite patterns, bind to the graph, rank by sandbox score. causal_explore is this loop over causal RelOps."},
+    {"id": "querie-2010", "title": "QueRIE query log", "use": "AskLog is the act relation: question, RelOp hash, ticket, status. The actuator may scan it."}
+  ],
+  "socratic": {
+    "templates": [
+      {
+        "id": "west_sales",
+        "match": ["west", "sales", "region"],
+        "question": "West sales by category, largest first?",
+        "composite": "west_sales_by_category"
+      },
+      {
+        "id": "retrieve",
+        "match": ["product", "bookcase", "similar", "retrieve", "chunk", "nearest"],
+        "question": "Nearest product-name chunks, then West sales for those products?",
+        "composite": "rag_then_agg"
+      },
+      {
+        "id": "why",
+        "match": ["why", "because", "therefore", "cause", "causal"],
+        "question": "Cause–effect chunk pairs for a why-phrase?",
+        "composite": "rag_causal_pair"
+      },
+      {
+        "id": "whatif",
+        "match": ["what if", "discount", "intervene", "zero"],
+        "question": "What if West discount were zero?",
+        "composite": "intervene_west_discount"
+      },
+      {
+        "id": "loss",
+        "match": ["loss", "profit", "lose"],
+        "question": "Which slices lose money?",
+        "composite": "loss_makers"
+      },
+      {
+        "id": "share",
+        "match": ["share", "cut", "largest"],
+        "question": "Category share of sales, keep the largest?",
+        "composite": "share_then_cut"
+      }
+    ]
+  },
+  "ideate": {
+    "candidates": [
+      "west_sales_by_category",
+      "loss_makers",
+      "share_then_cut",
+      "rag_then_agg",
+      "rag_causal_pair",
+      "causal_then_agg",
+      "causal_then_intervene",
+      "intervene_west_discount"
+    ]
+  }
+}

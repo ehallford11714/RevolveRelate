@@ -1,0 +1,98 @@
+{
+  "id": "gene",
+  "title": "Bioinformatics gene / FASTA domain",
+  "description": "Public NCBI protein FASTA plus literature abstracts for pineoblastoma-associated genes. Bind KPIs and autocausal RelOps from the inferred schema. This is bound RelOp + heuristic search on declared columns — not a claim that the engine discovered etiology.",
+  "kind": "domain",
+  "sources": {
+    "ncbiEfetch": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id={accession}&rettype=fasta&retmode=text",
+    "ncbiGene": "https://www.ncbi.nlm.nih.gov/gene/{id}",
+    "uniprotFasta": "https://rest.uniprot.org/uniprotkb/{accession}.fasta",
+    "note": "Do not ingest whole genomes. Mine accession-sized public FASTA plus annotation abstracts that contain causal cues."
+  },
+  "accessions": [
+    {"symbol": "DICER1", "ncbiGeneId": "23405", "protein": "NP_803187.1", "uniprot": "Q9UPY3"},
+    {"symbol": "RB1", "ncbiGeneId": "5925", "protein": "NP_000312.2", "uniprot": "P06400"},
+    {"symbol": "DROSHA", "ncbiGeneId": "29102", "protein": "NP_037367.3", "uniprot": "Q9NRR4"},
+    {"symbol": "DGCR8", "ncbiGeneId": "54487", "protein": "NP_073557.3", "uniprot": "Q8WYQ5"}
+  ],
+  "aliases": {
+    "pinealblastoma": "Pineoblastoma",
+    "pineal blastoma": "Pineoblastoma",
+    "pineoblastoma": "Pineoblastoma"
+  },
+  "questions": [
+    "what causes pinealblastoma",
+    "what causes pineoblastoma",
+    "what causes this pinealblastoma genetic etiology",
+    "nearest DICER1 FASTA",
+    "cases by gene KPI"
+  ],
+  "followOn": [
+    {
+      "symbol": "PLAGL2",
+      "ncbiGeneId": "5326",
+      "protein": "NP_002648.2",
+      "uniprot": "Q9NZI6",
+      "summary": "PLAGL2 is a zinc-finger transcription factor. Loss of let-7/miR-98-5p causes PLAGL2 derepression because those miRNAs normally repress it. Therefore pineoblastoma programs can activate CCND2.",
+      "disease": "Pineoblastoma",
+      "role": "downstream",
+      "evidence": "The DICER1/let-7 axis causes PLAGL2 upregulation because miRNA repression fails. Therefore CCND2 transcription rises.",
+      "associationScore": 0.58,
+      "cases": 6.0,
+      "lofCount": 2.0
+    },
+    {
+      "symbol": "CCND2",
+      "ncbiGeneId": "894",
+      "protein": "NP_001750.1",
+      "uniprot": "P30279",
+      "summary": "CCND2 encodes cyclin D2. PLAGL2 causes CCND2 transcription because the factor binds cyclin-D promoters. Therefore cell-cycle drive increases in pineoblastoma models.",
+      "disease": "Pineoblastoma",
+      "role": "downstream",
+      "evidence": "CCND2 is caused to rise after PLAGL2 derepression because the let-7 target axis is intact. Therefore cases track the microprocessor genes.",
+      "associationScore": 0.54,
+      "cases": 5.0,
+      "lofCount": 1.0
+    }
+  ],
+  "kpis": [
+    {
+      "id": "cases_by_gene",
+      "title": "Reported cases summed by gene symbol",
+      "recipe": "sum_by_dimension",
+      "args": {"measure": "Cases", "dimension": "Symbol"}
+    },
+    {
+      "id": "share_of_cases",
+      "title": "Each gene's share of reported cases",
+      "recipe": "share_of_total",
+      "args": {"measure": "Cases", "dimension": "Symbol"}
+    },
+    {
+      "id": "association_by_disease",
+      "title": "Association score by disease name",
+      "recipe": "sum_by_dimension",
+      "args": {"measure": "AssociationScore", "dimension": "DiseaseName"}
+    },
+    {
+      "id": "lof_by_gene",
+      "title": "Loss-of-function count by gene",
+      "recipe": "sum_by_dimension",
+      "args": {"measure": "LoFCount", "dimension": "Symbol"}
+    },
+    {
+      "id": "top_association",
+      "title": "Top gene-disease association rows",
+      "recipe": "top_n",
+      "args": {"measure": "AssociationScore", "n": 8}
+    }
+  ],
+  "binds": {
+    "measure": "Cases",
+    "treatment": "LoFCount",
+    "dimension": "DiseaseName",
+    "column": "Abstract",
+    "geneDimension": "Symbol"
+  },
+  "honesty": "Pearl identification is not claimed. Overlay chunks public abstracts and FASTA headers; live overlay is TEMP from live non-PII text after a dummy ticket."
+}

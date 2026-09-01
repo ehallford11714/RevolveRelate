@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://revolverelate.dev/spec/primitives.schema.json",
+  "title": "RelationalPrimitives",
+  "description": "Base primitives imputed from a live catalog, then verified. Language-agnostic.",
+  "type": "object",
+  "required": ["entities"],
+  "properties": {
+    "entities": { "type": "array", "items": { "$ref": "schema-graph.schema.json#/$defs/entity" } },
+    "relationships": { "type": "array", "items": { "$ref": "schema-graph.schema.json#/$defs/relationship" } },
+    "domains": { "type": "array", "items": { "$ref": "#/$defs/domain" } },
+    "constraints": { "type": "array", "items": { "$ref": "#/$defs/constraint" } },
+    "indexes": { "type": "array", "items": { "$ref": "#/$defs/index" } },
+    "synonyms": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "domain": {
+      "type": "object",
+      "required": ["name", "type"],
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "check": { "type": "string" },
+        "enum": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "constraint": {
+      "type": "object",
+      "required": ["name", "kind", "entity"],
+      "properties": {
+        "name": { "type": "string" },
+        "kind": { "type": "string", "enum": ["primary_key", "foreign_key", "unique", "check"] },
+        "entity": { "type": "string" },
+        "attrs": { "type": "array", "items": { "type": "string" } },
+        "refEntity": { "type": "string" },
+        "refAttrs": { "type": "array", "items": { "type": "string" } },
+        "expr": { "type": "string" }
+      }
+    },
+    "index": {
+      "type": "object",
+      "required": ["name", "entity", "attrs"],
+      "properties": {
+        "name": { "type": "string" },
+        "entity": { "type": "string" },
+        "attrs": { "type": "array", "items": { "type": "string" } },
+        "unique": { "type": "boolean", "default": false }
+      }
+    }
+  }
+}

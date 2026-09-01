@@ -1,0 +1,39 @@
+{
+  "title": "Because-clause bind, heuristic search, GLM odds-ratio",
+  "description": "Autocausal exploratory contract: discourse binds treatment/outcome; dummy then live fact RelOp (no OverlayChunk); GLM odds-ratio validates. Identification is none. Overlay stays sandboxOnly.",
+  "kind": "causal_heuristic",
+  "identification": "none",
+  "evidenceGrade": "heuristic",
+  "composite": "heuristic_west_facts",
+  "treatments": {
+    "discount": "Discount",
+    "discounting": "Discount",
+    "price": "Discount",
+    "mutation": "LoFCount",
+    "lof": "LoFCount",
+    "germline": "LoFCount",
+    "loss": "LoFCount"
+  },
+  "outcomes": {
+    "sales": "Sales",
+    "fell": "Sales",
+    "revenue": "Sales",
+    "profit": "Profit",
+    "cases": "Cases",
+    "pineoblastoma": "Cases",
+    "pinealblastoma": "Cases"
+  },
+  "slices": {
+    "west": {"column": "Region", "value": "West"}
+  },
+  "encode": {
+    "fell": "low",
+    "heavy": "high",
+    "high": "high",
+    "low": "low"
+  },
+  "or": {
+    "alpha": 0.05,
+    "haldane": 0.5
+  }
+}

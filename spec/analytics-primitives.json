@@ -1,0 +1,528 @@
+{
+  "title": "RevolveRelate analytics primitives",
+  "description": "Schema-agnostic RelOp atoms. Chain them into composites to answer any business question. Bind to SchemaGraph at apply time. Never SQL. Add rows here to scale a family later.",
+  "families": [
+    {"id": "source", "title": "Where the relation starts"},
+    {"id": "grain", "title": "How entities are joined"},
+    {"id": "restrict", "title": "Row predicates"},
+    {"id": "project", "title": "Shape, sort, limit"},
+    {"id": "aggregate", "title": "Group and reduce"},
+    {"id": "window", "title": "Partitioned / running calculations"},
+    {"id": "set", "title": "Union, except, intersect"},
+    {"id": "derive", "title": "Row-level arithmetic and cases"},
+    {"id": "cut", "title": "Top, threshold, pareto, buckets"},
+    {"id": "time", "title": "Date grain and periods"},
+    {"id": "compare", "title": "Now versus a baseline"},
+    {"id": "stat", "title": "Describe a distribution"},
+    {"id": "quality", "title": "Profile the relation"},
+    {"id": "shape", "title": "Change grain or layout"},
+    {"id": "calendar", "title": "Fiscal and workday algebra"},
+    {"id": "sequence", "title": "Ordered events per entity"},
+    {"id": "hierarchy", "title": "Trees and subtotals"},
+    {"id": "nested", "title": "Arrays and JSON"},
+    {"id": "match", "title": "Approximate alignment"},
+    {"id": "chunk", "title": "Split text into retrieve units"},
+    {"id": "vector", "title": "Embed, overlay, knn, and similarity join"},
+    {"id": "intent", "title": "Objective, goal, and Socratic sub-questions"},
+    {"id": "world", "title": "Named views, interventions, and the act log"},
+    {"id": "search", "title": "Abduce, ideate, and explore legal RelOp"}
+  ],
+  "primitives": [
+    {"id": "scan_fact", "family": "source", "title": "Scan the inferred fact entity", "binds": []},
+    {"id": "scan_entity", "family": "source", "title": "Scan a named entity", "binds": ["entity"]},
+    {"id": "scan_dimension", "family": "source", "title": "Scan the entity that owns a dimension", "binds": ["dimension"]},
+    {"id": "scan_measure", "family": "source", "title": "Scan the entity that owns a measure", "binds": ["measure"]},
+    {"id": "star_join", "family": "source", "title": "Fact plus every needed bound entity", "binds": ["measure", "dimension", "date"]},
+    {"id": "distinct_scan", "family": "source", "title": "Distinct rows of a dimension entity", "binds": ["dimension"]},
+    {"id": "sample_limit", "family": "source", "title": "Cap the current relation", "binds": ["n"]},
+    {"id": "with_cte", "family": "source", "title": "Wrap the current relation as a named CTE", "binds": ["name"]},
+    {"id": "values_one", "family": "source", "title": "One-row values relation (for set tests)", "binds": ["value"]},
+    {"id": "scan_date", "family": "source", "title": "Scan the entity that owns a date column", "binds": ["date"]},
+
+    {"id": "join_inner", "family": "grain", "title": "Inner-join path to an entity", "binds": ["entity"]},
+    {"id": "join_left", "family": "grain", "title": "Left-join path to an entity", "binds": ["entity"]},
+    {"id": "join_right", "family": "grain", "title": "Right-join path to an entity", "binds": ["entity"]},
+    {"id": "join_path", "family": "grain", "title": "Walk FKs from current fact to a column's entity", "binds": ["column"]},
+    {"id": "join_fact_dim", "family": "grain", "title": "Join fact to a dimension column", "binds": ["dimension"]},
+    {"id": "join_all_needed", "family": "grain", "title": "Join fact to measure, dimension, and date", "binds": ["measure", "dimension", "date"]},
+    {"id": "semi_join", "family": "grain", "title": "Keep left rows that match (inner join)", "binds": ["entity"]},
+    {"id": "anti_join", "family": "grain", "title": "Keep left rows that do not match (left join)", "binds": ["entity"]},
+    {"id": "coverage_left", "family": "grain", "title": "Left-join fact onto a dimension entity", "binds": ["dimension"]},
+    {"id": "attach_date", "family": "grain", "title": "Join the date entity onto the current fact", "binds": ["date"]},
+
+    {"id": "eq", "family": "restrict", "title": "column = value", "binds": ["column", "value"], "cmp": "="},
+    {"id": "neq", "family": "restrict", "title": "column != value", "binds": ["column", "value"], "cmp": "!="},
+    {"id": "gt", "family": "restrict", "title": "column > value", "binds": ["column", "value"], "cmp": ">"},
+    {"id": "gte", "family": "restrict", "title": "column >= value", "binds": ["column", "value"], "cmp": ">="},
+    {"id": "lt", "family": "restrict", "title": "column < value", "binds": ["column", "value"], "cmp": "<"},
+    {"id": "lte", "family": "restrict", "title": "column <= value", "binds": ["column", "value"], "cmp": "<="},
+    {"id": "in_list", "family": "restrict", "title": "column IN list", "binds": ["column", "values"], "cmp": "in"},
+    {"id": "not_in", "family": "restrict", "title": "column NOT IN list", "binds": ["column", "values"], "cmp": "not in"},
+    {"id": "like", "family": "restrict", "title": "column LIKE pattern", "binds": ["column", "value"], "cmp": "like"},
+    {"id": "not_like", "family": "restrict", "title": "column NOT LIKE pattern", "binds": ["column", "value"], "cmp": "not like"},
+    {"id": "between", "family": "restrict", "title": "column BETWEEN lo AND hi", "binds": ["column", "values"], "cmp": "between"},
+    {"id": "is_null", "family": "restrict", "title": "column IS NULL", "binds": ["column"], "cmp": "is null"},
+    {"id": "is_not_null", "family": "restrict", "title": "column IS NOT NULL", "binds": ["column"], "cmp": "is not null"},
+    {"id": "and_also", "family": "restrict", "title": "AND another equality onto the current filter", "binds": ["column", "value"]},
+    {"id": "or_else", "family": "restrict", "title": "OR another equality onto the current filter", "binds": ["column", "value"]},
+    {"id": "negate", "family": "restrict", "title": "NOT the current predicate", "binds": []},
+    {"id": "sample_eq", "family": "restrict", "title": "Equality to the first schema sample of a column", "binds": ["column"]},
+    {"id": "year_like", "family": "restrict", "title": "Date column LIKE year-%", "binds": ["date", "year"]},
+    {"id": "prefix_like", "family": "restrict", "title": "column LIKE prefix%", "binds": ["column", "value"]},
+    {"id": "measure_positive", "family": "restrict", "title": "measure > 0", "binds": ["measure"]},
+    {"id": "measure_negative", "family": "restrict", "title": "measure < 0", "binds": ["measure"]},
+    {"id": "measure_zero", "family": "restrict", "title": "measure = 0", "binds": ["measure"]},
+    {"id": "measure_above", "family": "restrict", "title": "measure > threshold", "binds": ["measure", "threshold"]},
+    {"id": "measure_below", "family": "restrict", "title": "measure < threshold", "binds": ["measure", "threshold"]},
+
+    {"id": "project_measure", "family": "project", "title": "Keep a measure column", "binds": ["measure"]},
+    {"id": "project_dimension", "family": "project", "title": "Keep a dimension column", "binds": ["dimension"]},
+    {"id": "project_pair", "family": "project", "title": "Keep measure and dimension", "binds": ["measure", "dimension"]},
+    {"id": "project_star", "family": "project", "title": "Project star (pass-through)", "binds": []},
+    {"id": "rename", "family": "project", "title": "Alias a measure as value", "binds": ["measure", "alias"]},
+    {"id": "limit", "family": "project", "title": "LIMIT n", "binds": ["n"]},
+    {"id": "offset", "family": "project", "title": "LIMIT n OFFSET k", "binds": ["n", "offset"]},
+    {"id": "sort_asc", "family": "project", "title": "Order a column ascending", "binds": ["column"]},
+    {"id": "sort_desc", "family": "project", "title": "Order a column descending", "binds": ["column"]},
+    {"id": "sort_value_desc", "family": "project", "title": "Order alias value descending", "binds": []},
+    {"id": "distinct_col", "family": "project", "title": "Distinct values of a dimension", "binds": ["dimension"]},
+
+    {"id": "agg_sum", "family": "aggregate", "title": "SUM(measure)", "binds": ["measure"], "fn": "sum"},
+    {"id": "agg_count", "family": "aggregate", "title": "COUNT(measure)", "binds": ["measure"], "fn": "count"},
+    {"id": "agg_count_star", "family": "aggregate", "title": "COUNT(*)", "binds": [], "fn": "count"},
+    {"id": "agg_count_distinct", "family": "aggregate", "title": "COUNT(DISTINCT column)", "binds": ["column"], "fn": "count"},
+    {"id": "agg_avg", "family": "aggregate", "title": "AVG(measure)", "binds": ["measure"], "fn": "avg"},
+    {"id": "agg_min", "family": "aggregate", "title": "MIN(measure)", "binds": ["measure"], "fn": "min"},
+    {"id": "agg_max", "family": "aggregate", "title": "MAX(measure)", "binds": ["measure"], "fn": "max"},
+    {"id": "group_1", "family": "aggregate", "title": "Group by one dimension (keep current aggs or count)", "binds": ["dimension"]},
+    {"id": "group_2", "family": "aggregate", "title": "Group by two dimensions", "binds": ["dimension", "dimension2"]},
+    {"id": "agg_sum_by", "family": "aggregate", "title": "SUM(measure) GROUP BY dimension", "binds": ["measure", "dimension"]},
+    {"id": "agg_count_by", "family": "aggregate", "title": "COUNT(*) GROUP BY dimension", "binds": ["dimension"]},
+    {"id": "agg_avg_by", "family": "aggregate", "title": "AVG(measure) GROUP BY dimension", "binds": ["measure", "dimension"]},
+    {"id": "having_gt", "family": "aggregate", "title": "HAVING value > threshold", "binds": ["threshold"]},
+    {"id": "having_lt", "family": "aggregate", "title": "HAVING value < threshold", "binds": ["threshold"]},
+    {"id": "having_ge", "family": "aggregate", "title": "HAVING value >= threshold", "binds": ["threshold"]},
+    {"id": "having_le", "family": "aggregate", "title": "HAVING value <= threshold", "binds": ["threshold"]},
+
+    {"id": "win_rank", "family": "window", "title": "RANK() OVER (ORDER BY measure DESC)", "binds": ["measure"], "fn": "rank"},
+    {"id": "win_dense_rank", "family": "window", "title": "DENSE_RANK() OVER measure", "binds": ["measure"], "fn": "dense_rank"},
+    {"id": "win_row_number", "family": "window", "title": "ROW_NUMBER() OVER measure", "binds": ["measure"], "fn": "row_number"},
+    {"id": "win_running_sum", "family": "window", "title": "Running SUM(measure)", "binds": ["measure"], "fn": "sum"},
+    {"id": "win_running_avg", "family": "window", "title": "Running AVG(measure)", "binds": ["measure"], "fn": "avg"},
+    {"id": "win_running_count", "family": "window", "title": "Running COUNT(*)", "binds": [], "fn": "count"},
+    {"id": "win_share_total", "family": "window", "title": "Group sum plus SUM() OVER () total", "binds": ["measure", "dimension"]},
+    {"id": "win_share_partition", "family": "window", "title": "SUM(measure) OVER (PARTITION BY dimension)", "binds": ["measure", "dimension"]},
+    {"id": "win_lag", "family": "window", "title": "LAG(measure)", "binds": ["measure", "date"], "fn": "lag"},
+    {"id": "win_lead", "family": "window", "title": "LEAD(measure)", "binds": ["measure", "date"], "fn": "lead"},
+    {"id": "win_ntile", "family": "window", "title": "NTILE(n) OVER measure", "binds": ["measure", "n"], "fn": "ntile"},
+    {"id": "win_percent_rank", "family": "window", "title": "PERCENT_RANK() OVER measure", "binds": ["measure"], "fn": "percent_rank"},
+    {"id": "win_first", "family": "window", "title": "FIRST_VALUE(measure)", "binds": ["measure"], "fn": "first_value"},
+    {"id": "win_last", "family": "window", "title": "LAST_VALUE(measure)", "binds": ["measure"], "fn": "last_value"},
+    {"id": "win_running_by_date", "family": "window", "title": "Running sum ordered by date", "binds": ["measure", "date"]},
+    {"id": "win_rank_in_dim", "family": "window", "title": "RANK() PARTITION BY dimension", "binds": ["measure", "dimension"]},
+
+    {"id": "set_union", "family": "set", "title": "Union two dimension slices", "binds": ["dimension", "left", "right"]},
+    {"id": "set_union_all", "family": "set", "title": "Union all two dimension slices", "binds": ["dimension", "left", "right"]},
+    {"id": "set_except", "family": "set", "title": "All keys except a slice", "binds": ["dimension", "value"]},
+    {"id": "set_intersect", "family": "set", "title": "Intersect a slice with all keys", "binds": ["dimension", "value"]},
+    {"id": "union_two_slices", "family": "set", "title": "West-style ∪ South-style on any dimension", "binds": ["dimension", "left", "right"]},
+    {"id": "except_slice", "family": "set", "title": "Entity keys minus one slice", "binds": ["dimension", "value"]},
+
+    {"id": "ratio", "family": "derive", "title": "measure_a / measure_b (projected)", "binds": ["measure", "measure2"]},
+    {"id": "difference", "family": "derive", "title": "measure_a - measure_b", "binds": ["measure", "measure2"]},
+    {"id": "product", "family": "derive", "title": "measure_a * measure_b", "binds": ["measure", "measure2"]},
+    {"id": "add", "family": "derive", "title": "measure + measure2", "binds": ["measure", "measure2"]},
+    {"id": "subtract", "family": "derive", "title": "Alias of difference", "binds": ["measure", "measure2"]},
+    {"id": "divide", "family": "derive", "title": "Alias of ratio", "binds": ["measure", "measure2"]},
+    {"id": "abs_fn", "family": "derive", "title": "ABS(measure)", "binds": ["measure"]},
+    {"id": "invert", "family": "derive", "title": "1 / measure", "binds": ["measure"]},
+    {"id": "case_negative", "family": "derive", "title": "Keep rows where measure < 0", "binds": ["measure"]},
+    {"id": "coalesce_zero", "family": "derive", "title": "COALESCE(measure, 0)", "binds": ["measure"]},
+
+    {"id": "top_n", "family": "cut", "title": "Top n rows by measure", "binds": ["measure", "n"]},
+    {"id": "bottom_n", "family": "cut", "title": "Bottom n rows by measure", "binds": ["measure", "n"]},
+    {"id": "top_n_per_group", "family": "cut", "title": "Rank within dimension then keep rk <= n", "binds": ["measure", "dimension", "n"]},
+    {"id": "threshold_above", "family": "cut", "title": "Keep measure > threshold", "binds": ["measure", "threshold"]},
+    {"id": "threshold_below", "family": "cut", "title": "Keep measure < threshold", "binds": ["measure", "threshold"]},
+    {"id": "pareto_running", "family": "cut", "title": "Grouped sum sorted with running window", "binds": ["measure", "dimension"]},
+    {"id": "ntile_bucket", "family": "cut", "title": "NTILE bucket on a measure", "binds": ["measure", "n"]},
+    {"id": "outlier_top", "family": "cut", "title": "Top 1% stand-in: top 3 by measure", "binds": ["measure"]},
+
+    {"id": "period_year", "family": "time", "title": "Filter date LIKE year-%", "binds": ["year", "date"]},
+    {"id": "period_like", "family": "time", "title": "Filter date LIKE pattern", "binds": ["value", "date"]},
+    {"id": "order_by_date", "family": "time", "title": "Sort by date", "binds": ["date"]},
+    {"id": "first_date", "family": "time", "title": "MIN(date)", "binds": ["date"]},
+    {"id": "last_date", "family": "time", "title": "MAX(date)", "binds": ["date"]},
+    {"id": "trailing_n", "family": "time", "title": "Latest n rows by date desc", "binds": ["n", "date"]},
+    {"id": "date_trunc_month", "family": "time", "title": "Bucket date to year-month", "binds": ["date"]},
+    {"id": "extract_year", "family": "time", "title": "Project year from a date column", "binds": ["date"]},
+    {"id": "yoy", "family": "time", "title": "Keep current and prior year rows for compare", "binds": ["date", "year"]},
+    {"id": "ytd", "family": "time", "title": "Filter date in year-to-as-of", "binds": ["date", "year"]},
+    {"id": "trailing_period", "family": "time", "title": "Latest n dated rows (period stand-in)", "binds": ["n", "date"]},
+
+    {"id": "safe_div", "family": "derive", "title": "measure / NULLIF(measure2, 0)", "binds": ["measure", "measure2"]},
+    {"id": "margin_pct", "family": "derive", "title": "(measure - measure2) / NULLIF(measure, 0)", "binds": ["measure", "measure2"]},
+    {"id": "case_when", "family": "derive", "title": "CASE WHEN measure > threshold THEN measure ELSE 0", "binds": ["measure", "threshold"]},
+
+    {"id": "sum_if", "family": "aggregate", "title": "SUM measure where it is positive", "binds": ["measure"]},
+    {"id": "count_if", "family": "aggregate", "title": "COUNT rows where measure > 0", "binds": ["measure"]},
+    {"id": "weighted_avg", "family": "aggregate", "title": "SUM(m*w) / SUM(w)", "binds": ["measure", "measure2"]},
+
+    {"id": "period_delta", "family": "window", "title": "value - LAG(value) on date", "binds": ["measure", "date"]},
+    {"id": "cume_dist", "family": "window", "title": "CUME_DIST() OVER measure", "binds": ["measure"]},
+
+    {"id": "top_pct", "family": "cut", "title": "Keep percent_rank <= p", "binds": ["measure", "p"]},
+    {"id": "above_mean", "family": "cut", "title": "Keep rows above AVG() OVER ()", "binds": ["measure"]},
+
+    {"id": "vs_prior", "family": "compare", "title": "Grouped value vs LAG on the time grain", "binds": ["measure", "dimension", "date"]},
+    {"id": "vs_peer", "family": "compare", "title": "Grouped value vs AVG() OVER ()", "binds": ["measure", "dimension"]},
+    {"id": "vs_target", "family": "compare", "title": "Measure vs a bound target", "binds": ["measure", "threshold"]},
+    {"id": "growth_pct", "family": "compare", "title": "(now - prior) / NULLIF(prior, 0) after vs_prior", "binds": ["measure", "dimension", "date"]},
+    {"id": "index_100", "family": "compare", "title": "100 * value / FIRST_VALUE", "binds": ["measure", "date"]},
+    {"id": "contribution", "family": "compare", "title": "Slice share of total (change stand-in)", "binds": ["measure", "dimension"]},
+
+    {"id": "median", "family": "stat", "title": "Middle row of a measure (row_number mid)", "binds": ["measure"]},
+    {"id": "pctl", "family": "stat", "title": "Row at percent_rank >= p", "binds": ["measure", "p"]},
+    {"id": "stddev", "family": "stat", "title": "STDDEV_SAMP(measure)", "binds": ["measure"]},
+    {"id": "variance", "family": "stat", "title": "VAR_SAMP(measure)", "binds": ["measure"]},
+    {"id": "iqr", "family": "stat", "title": "p75 minus p25 stand-in via ntile", "binds": ["measure"]},
+    {"id": "corr", "family": "stat", "title": "Pair of measures for association (projected)", "binds": ["measure", "measure2"]},
+    {"id": "zscore", "family": "stat", "title": "value minus AVG() OVER () (z stand-in)", "binds": ["measure"]},
+
+    {"id": "null_rate", "family": "quality", "title": "(n - COUNT(col)) / n", "binds": ["column"]},
+    {"id": "complete_rate", "family": "quality", "title": "COUNT(col) / n", "binds": ["column"]},
+    {"id": "distinct_rate", "family": "quality", "title": "COUNT DISTINCT / COUNT(*)", "binds": ["column"]},
+    {"id": "freshness", "family": "quality", "title": "MAX(date)", "binds": ["date"]},
+    {"id": "volume", "family": "quality", "title": "COUNT(*) at current grain", "binds": []},
+
+    {"id": "first_row_per", "family": "shape", "title": "ROW_NUMBER = 1 inside a dimension", "binds": ["dimension", "date"]},
+    {"id": "widen", "family": "shape", "title": "CASE dim samples into columns", "binds": ["dimension", "measure"]},
+    {"id": "stack", "family": "shape", "title": "Union two measures as name/value rows", "binds": ["measure", "measure2"]},
+    {"id": "pivot", "family": "shape", "title": "Alias of widen", "binds": ["dimension", "measure"]},
+    {"id": "unpivot", "family": "shape", "title": "Alias of stack", "binds": ["measure", "measure2"]},
+
+    {"id": "fiscal_year", "family": "calendar", "title": "Year extracted from date (fiscal stand-in)", "binds": ["date"]},
+    {"id": "workdays", "family": "calendar", "title": "Julian day number of a date", "binds": ["date"]},
+    {"id": "date_add", "family": "calendar", "title": "Date shifted by +1 year (stand-in)", "binds": ["date"]},
+    {"id": "holiday_flag", "family": "calendar", "title": "Date LIKE %-12-25 (holiday stand-in)", "binds": ["date"]},
+
+    {"id": "next_event", "family": "sequence", "title": "LEAD(date) per dimension", "binds": ["dimension", "date"]},
+    {"id": "gap", "family": "sequence", "title": "Date minus LAG(date) per dimension", "binds": ["dimension", "date"]},
+    {"id": "sessionize", "family": "sequence", "title": "ROW_NUMBER per dimension ordered by date", "binds": ["dimension", "date"]},
+    {"id": "first_touch", "family": "sequence", "title": "First row per dimension by date asc", "binds": ["dimension", "date"]},
+    {"id": "repeat", "family": "sequence", "title": "Entities with COUNT(*) > 1", "binds": ["dimension"]},
+
+    {"id": "rollup", "family": "hierarchy", "title": "Group dim UNION ALL grand total", "binds": ["measure", "dimension"]},
+    {"id": "cube", "family": "hierarchy", "title": "Two-dim cube via UNION of grains", "binds": ["measure", "dimension", "dimension2"]},
+    {"id": "ancestors", "family": "hierarchy", "title": "Distinct parent dimension values", "binds": ["dimension"]},
+    {"id": "descendants", "family": "hierarchy", "title": "Distinct child dimension values", "binds": ["dimension2"]},
+    {"id": "leaf", "family": "hierarchy", "title": "Distinct finest dimension values", "binds": ["dimension"]},
+
+    {"id": "unnest", "family": "nested", "title": "Open overlay chunks for a text column (JSON unnest when no overlay)", "binds": ["column"]},
+    {"id": "element", "family": "nested", "title": "Take the first n characters, or a JSON path element", "binds": ["column", "n"]},
+    {"id": "nested_len", "family": "nested", "title": "LENGTH(column)", "binds": ["column"]},
+    {"id": "nested_keys", "family": "nested", "title": "Distinct values of a column", "binds": ["column"]},
+
+    {"id": "asof_join", "family": "match", "title": "LAST_VALUE(measure) over date", "binds": ["measure", "date", "dimension"]},
+    {"id": "nearest", "family": "match", "title": "ABS(measure - target) then rank", "binds": ["measure", "threshold"]},
+    {"id": "fuzzy_eq", "family": "match", "title": "column LIKE value%", "binds": ["column", "value"]},
+
+    {"id": "chunk_fixed", "family": "chunk", "title": "Fixed-size token windows", "binds": ["column", "n"]},
+    {"id": "chunk_token", "family": "chunk", "title": "Token windows with overlap", "binds": ["column", "n"]},
+    {"id": "chunk_sentence", "family": "chunk", "title": "One sentence per chunk", "binds": ["column"]},
+    {"id": "chunk_window", "family": "chunk", "title": "Sliding sentence window", "binds": ["column", "n"]},
+    {"id": "chunk_recursive", "family": "chunk", "title": "Recursive split by paragraph, sentence, then token", "binds": ["column", "n"]},
+    {"id": "chunk_semantic", "family": "chunk", "title": "Break on consecutive embedding-distance peaks (Kamradt)", "binds": ["column", "threshold"]},
+    {"id": "chunk_causal", "family": "chunk", "title": "Cause, effect, condition, and event units with roles", "binds": ["column"]},
+    {"id": "chunk_hier", "family": "chunk", "title": "Parent passage plus child sentences", "binds": ["column"]},
+    {"id": "chunk_prop", "family": "chunk", "title": "Clause / proposition splits", "binds": ["column"]},
+    {"id": "chunk_late", "family": "chunk", "title": "Keep the full text as the embed unit, sentences as retrieve units", "binds": ["column"]},
+    {"id": "chunk_topic", "family": "chunk", "title": "Break when the next sentence leaves the group centroid", "binds": ["column", "threshold"]},
+    {"id": "chunk_discourse", "family": "chunk", "title": "Contrast and concession discourse units", "binds": ["column"]},
+    {"id": "chunk_event", "family": "chunk", "title": "Temporal event chain", "binds": ["column"]},
+
+    {"id": "overlay", "family": "source", "title": "Scan the dummy vector overlay (chunks + hash embeddings)", "binds": ["column"]},
+    {"id": "embed", "family": "vector", "title": "Project the overlay hash vector and fingerprint", "binds": ["column", "query"]},
+    {"id": "knn", "family": "vector", "title": "Nearest overlay chunks to a query string", "binds": ["query", "n", "column"]},
+    {"id": "sim_join", "family": "vector", "title": "Join overlay chunks that sit near each other in hash space", "binds": ["n", "column"]},
+    {"id": "attach_source", "family": "vector", "title": "Join overlay chunks back to their source entity", "binds": ["entity"]},
+    {"id": "rerank", "family": "vector", "title": "Re-sort overlay hits by hash distance to the query", "binds": ["query", "n"]},
+    {"id": "attach_fact", "family": "vector", "title": "Join overlay hits to the fact grain (and optional slice)", "binds": ["entity", "column", "value"]},
+    {"id": "role_is", "family": "vector", "title": "Keep overlay chunks whose causal Role matches (cause, effect, condition, …)", "binds": ["value"]},
+    {"id": "filter_cue", "family": "vector", "title": "Keep overlay chunks whose discourse Cue matches", "binds": ["value"]},
+    {"id": "pair_causal", "family": "vector", "title": "Self-join cause chunks to effect chunks on SourcePk and Cue", "binds": ["left", "right"]},
+
+    {"id": "objective", "family": "intent", "title": "Bind an English objective onto the current relation", "binds": ["query"]},
+    {"id": "goal", "family": "intent", "title": "Score a measure against a target (utility)", "binds": ["measure", "threshold"]},
+    {"id": "socratic", "family": "intent", "title": "Decompose an objective into sub-questions and named composites", "binds": ["query"]},
+
+    {"id": "ask_log", "family": "world", "title": "Scan the dummy act log (questions, RelOp hashes, tickets)", "binds": []},
+    {"id": "hypothesize", "family": "world", "title": "Name the current RelOp as a dummy CTE view", "binds": ["name"]},
+    {"id": "intervene", "family": "world", "title": "What-if CASE rewrite of a measure when a slice holds (never a live update)", "binds": ["measure", "column", "value", "threshold"]},
+    {"id": "vs_world", "family": "compare", "title": "Sum observed vs intervened by dimension", "binds": ["dimension"]},
+
+    {"id": "abduce", "family": "search", "title": "Pick the legal composite that best matches the objective", "binds": ["query"]},
+    {"id": "ideate", "family": "search", "title": "Enumerate legal RelOp candidates for an objective", "binds": ["query"]},
+    {"id": "explore", "family": "search", "title": "Socratic decompose then list ideate candidates", "binds": ["query"]}
+  ],
+  "composites": [
+    {
+      "id": "west_sales_by_category",
+      "question": "West sales by category, largest first",
+      "steps": [
+        {"op": "scan_fact"},
+        {"op": "eq", "column": "Region", "value": "West"},
+        {"op": "agg_sum_by", "measure": "Sales", "dimension": "Category"},
+        {"op": "sort_value_desc"},
+        {"op": "limit", "n": 10}
+      ]
+    },
+    {
+      "id": "loss_makers",
+      "question": "Which slices lose money?",
+      "steps": [
+        {"op": "scan_fact"},
+        {"op": "measure_negative", "measure": "Profit"},
+        {"op": "agg_sum_by", "measure": "Profit", "dimension": "Segment"},
+        {"op": "sort_value_desc"}
+      ]
+    },
+    {
+      "id": "share_then_cut",
+      "question": "Category share of sales, keep the largest",
+      "steps": [
+        {"op": "win_share_total", "measure": "Sales", "dimension": "Category"},
+        {"op": "sort_value_desc"},
+        {"op": "limit", "n": 3}
+      ]
+    },
+    {
+      "id": "west_growth_by_category",
+      "question": "West category sales vs the book average",
+      "pattern": "slice_agg_compare",
+      "steps": [
+        {"op": "scan_fact"},
+        {"op": "eq", "column": "Region", "value": "West"},
+        {"op": "agg_sum_by", "measure": "Sales", "dimension": "Category"},
+        {"op": "vs_peer", "measure": "Sales", "dimension": "Category"},
+        {"op": "sort_value_desc"},
+        {"op": "limit", "n": 10}
+      ]
+    },
+    {
+      "id": "latest_then_margin",
+      "question": "Latest line per region, then margin",
+      "pattern": "shape_derive",
+      "steps": [
+        {"op": "scan_fact"},
+        {"op": "first_row_per", "dimension": "Region", "date": "OrderDate"},
+        {"op": "margin_pct", "measure": "Sales", "measure2": "Profit"}
+      ]
+    },
+    {
+      "id": "quality_then_book",
+      "question": "How complete is Sales, then how large is the book by region",
+      "pattern": "quality_gate",
+      "steps": [
+        {"op": "scan_fact"},
+        {"op": "complete_rate", "column": "Sales"}
+      ]
+    },
+    {
+      "id": "two_pass_peer_cut",
+      "question": "Sales by region vs peer average, keep above mean",
+      "pattern": "two_pass",
+      "steps": [
+        {"op": "scan_fact"},
+        {"op": "agg_sum_by", "measure": "Sales", "dimension": "Region"},
+        {"op": "with_cte", "name": "book"},
+        {"op": "vs_peer", "measure": "Sales", "dimension": "Region"},
+        {"op": "above_mean", "measure": "Sales"},
+        {"op": "sort_value_desc"}
+      ]
+    },
+    {
+      "id": "deep_compare_cut",
+      "question": "Positive 2016 sales by category vs peer, keep above mean, top 5",
+      "pattern": "deep_pass",
+      "steps": [
+        {"op": "scan_fact"},
+        {"op": "star_join", "measure": "Sales", "dimension": "Category", "date": "OrderDate"},
+        {"op": "measure_positive", "measure": "Sales"},
+        {"op": "period_year", "year": "2016", "date": "OrderDate"},
+        {"op": "agg_sum_by", "measure": "Sales", "dimension": "Category"},
+        {"op": "vs_peer", "measure": "Sales", "dimension": "Category"},
+        {"op": "above_mean", "measure": "Sales"},
+        {"op": "sort_value_desc"},
+        {"op": "limit", "n": 5}
+      ]
+    },
+    {
+      "id": "rag_semantic_knn",
+      "question": "Semantic chunks nearest to a phrase",
+      "pattern": "rag_retrieve",
+      "sandboxOnly": false,
+      "steps": [
+        {"op": "overlay", "column": "ProductName"},
+        {"op": "chunk_semantic", "column": "ProductName"},
+        {"op": "knn", "query": "bookcase", "n": 5, "column": "ProductName"}
+      ]
+    },
+    {
+      "id": "rag_causal_knn",
+      "question": "Causal chunks nearest to a phrase",
+      "pattern": "rag_retrieve",
+      "sandboxOnly": false,
+      "steps": [
+        {"op": "overlay", "column": "ProductName"},
+        {"op": "chunk_causal", "column": "ProductName"},
+        {"op": "knn", "query": "chair", "n": 5, "column": "ProductName"}
+      ]
+    },
+    {
+      "id": "rag_sim_join",
+      "question": "Overlay chunks that sit near each other",
+      "pattern": "rag_retrieve",
+      "sandboxOnly": false,
+      "steps": [
+        {"op": "overlay", "column": "ProductName"},
+        {"op": "sim_join", "n": 3, "column": "ProductName"}
+      ]
+    },
+    {
+      "id": "rag_topic_knn",
+      "question": "Topic chunks nearest to a phrase",
+      "pattern": "rag_retrieve",
+      "sandboxOnly": false,
+      "steps": [
+        {"op": "overlay", "column": "ProductName"},
+        {"op": "chunk_topic", "column": "ProductName"},
+        {"op": "knn", "query": "bookcase", "n": 5, "column": "ProductName"}
+      ]
+    },
+    {
+      "id": "rag_event_knn",
+      "question": "Event-chain chunks nearest to a phrase",
+      "pattern": "rag_retrieve",
+      "sandboxOnly": false,
+      "steps": [
+        {"op": "overlay", "column": "ProductName"},
+        {"op": "chunk_event", "column": "ProductName"},
+        {"op": "knn", "query": "chair", "n": 5, "column": "ProductName"}
+      ]
+    },
+    {
+      "id": "rag_then_agg",
+      "question": "Nearest product-name chunks, then West sales for those products",
+      "pattern": "rag_answer",
+      "sandboxOnly": false,
+      "steps": [
+        {"op": "overlay", "column": "ProductName"},
+        {"op": "chunk_semantic", "column": "ProductName"},
+        {"op": "knn", "query": "bookcase", "n": 8, "column": "ProductName"},
+        {"op": "hypothesize", "name": "Hits"},
+        {"op": "attach_source", "entity": "Product"},
+        {"op": "attach_fact", "entity": "Product", "column": "Region", "value": "West"},
+        {"op": "agg_sum_by", "measure": "Sales", "dimension": "Category"},
+        {"op": "vs_peer", "measure": "Sales", "dimension": "Category"}
+      ]
+    },
+    {
+      "id": "rag_causal_pair",
+      "question": "Cause–effect chunk pairs nearest to a why-phrase",
+      "pattern": "rag_retrieve",
+      "sandboxOnly": false,
+      "steps": [
+        {"op": "overlay", "column": "ProductName"},
+        {"op": "chunk_causal", "column": "ProductName"},
+        {"op": "knn", "query": "sales fell because discounting", "n": 8, "column": "ProductName"},
+        {"op": "pair_causal"},
+        {"op": "hypothesize", "name": "Pairs"}
+      ]
+    },
+    {
+      "id": "causal_then_agg",
+      "question": "Causal pairs, then West sales for those products vs peer",
+      "pattern": "rag_answer",
+      "sandboxOnly": false,
+      "steps": [
+        {"op": "overlay", "column": "ProductName"},
+        {"op": "chunk_causal", "column": "ProductName"},
+        {"op": "knn", "query": "sales fell because discounting", "n": 8, "column": "ProductName"},
+        {"op": "pair_causal"},
+        {"op": "hypothesize", "name": "Pairs"},
+        {"op": "attach_source", "entity": "Product"},
+        {"op": "attach_fact", "entity": "Product", "column": "Region", "value": "West"},
+        {"op": "agg_sum_by", "measure": "Sales", "dimension": "Category"},
+        {"op": "vs_peer", "measure": "Sales", "dimension": "Category"}
+      ]
+    },
+    {
+      "id": "causal_then_intervene",
+      "question": "Retrieved causes, then what if West discount were zero",
+      "pattern": "what_if",
+      "sandboxOnly": false,
+      "steps": [
+        {"op": "overlay", "column": "ProductName"},
+        {"op": "chunk_causal", "column": "ProductName"},
+        {"op": "knn", "query": "sales fell because discounting", "n": 8, "column": "ProductName"},
+        {"op": "role_is", "value": "cause"},
+        {"op": "hypothesize", "name": "Causes"},
+        {"op": "attach_source", "entity": "Product"},
+        {"op": "attach_fact", "entity": "Product", "column": "Region", "value": "West"},
+        {"op": "intervene", "measure": "Discount", "column": "Region", "value": "West", "threshold": 0},
+        {"op": "vs_world", "measure": "Discount", "dimension": "Category", "column": "Region", "value": "West", "threshold": 0}
+      ]
+    },
+    {
+      "id": "intervene_west_discount",
+      "question": "What if West discount were zero?",
+      "pattern": "what_if",
+      "sandboxOnly": false,
+      "steps": [
+        {"op": "scan_fact"},
+        {"op": "star_join", "measure": "Discount", "dimension": "Category", "date": "OrderDate"},
+        {"op": "intervene", "measure": "Discount", "column": "Region", "value": "West", "threshold": 0},
+        {"op": "vs_world", "measure": "Discount", "dimension": "Category", "column": "Region", "value": "West", "threshold": 0}
+      ]
+    },
+    {
+      "id": "heuristic_west_facts",
+      "question": "West fact rows for GLM odds-ratio (no overlay; live-promoteable)",
+      "pattern": "slice_agg_cut",
+      "steps": [
+        {"op": "star_join", "measure": "Sales", "dimension": "Category", "date": "OrderDate"},
+        {"op": "eq", "column": "Region", "value": "West"}
+      ]
+    },
+    {
+      "id": "pearl_backdoor_facts",
+      "question": "Fact rows with Category for backdoor adjustment (no overlay; live-promoteable)",
+      "pattern": "pearl_backdoor",
+      "steps": [
+        {"op": "star_join", "measure": "Sales", "dimension": "Category", "date": "OrderDate"}
+      ]
+    },
+    {
+      "id": "pearl_do_west",
+      "question": "What if West discount were zero? CASE rewrite, dummy then live SELECT",
+      "pattern": "what_if",
+      "sandboxOnly": false,
+      "steps": [
+        {"op": "scan_fact"},
+        {"op": "star_join", "measure": "Discount", "dimension": "Category", "date": "OrderDate"},
+        {"op": "intervene", "measure": "Discount", "column": "Region", "value": "West", "threshold": 0},
+        {"op": "vs_world", "measure": "Discount", "dimension": "Category", "column": "Region", "value": "West", "threshold": 0}
+      ]
+    },
+    {
+      "id": "socratic_west",
+      "question": "Turn a West-sales objective into Socratic sub-questions",
+      "pattern": "socratic_quest",
+      "sandboxOnly": true,
+      "steps": [
+        {"op": "socratic", "query": "west sales by product retrieve"}
+      ]
+    }
+  ]
+}

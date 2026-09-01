@@ -1,0 +1,30 @@
+{
+  "name": "insert",
+  "ir": {
+    "kind": "mutate",
+    "op": {
+      "op": "insert",
+      "entity": "Customer",
+      "columns": ["FirstName", "LastName"],
+      "rows": [["Ada", "Lovelace"]]
+    }
+  },
+  "sql": {
+    "postgres": "INSERT INTO \"Customer\" (\"FirstName\", \"LastName\") VALUES ($1, $2)",
+    "sqlite": "INSERT INTO \"Customer\" (\"FirstName\", \"LastName\") VALUES (?, ?)",
+    "duckdb": "INSERT INTO \"Customer\" (\"FirstName\", \"LastName\") VALUES (?, ?)",
+    "mysql": "INSERT INTO `Customer` (`FirstName`, `LastName`) VALUES (?, ?)",
+    "tds": "INSERT INTO [Customer] ([FirstName], [LastName]) VALUES (@p1, @p2)",
+    "snowflake": "INSERT INTO \"Customer\" (\"FirstName\", \"LastName\") VALUES (?, ?)",
+    "bigquery": "INSERT INTO `Customer` (`FirstName`, `LastName`) VALUES (@p1, @p2)"
+  },
+  "params": {
+    "postgres": ["Ada", "Lovelace"],
+    "sqlite": ["Ada", "Lovelace"],
+    "duckdb": ["Ada", "Lovelace"],
+    "mysql": ["Ada", "Lovelace"],
+    "tds": ["Ada", "Lovelace"],
+    "snowflake": ["Ada", "Lovelace"],
+    "bigquery": ["Ada", "Lovelace"]
+  }
+}

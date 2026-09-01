@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://revolverelate.dev/spec/relational-ir.schema.json",
+  "title": "RelationalIR",
+  "description": "Dialect-agnostic relational algebra (RelOp tree) plus mutation/txn wrappers. The SLM fills this; the compiler emits SQL. Language-agnostic.",
+  "oneOf": [
+    { "$ref": "#/$defs/document" }
+  ],
+  "$defs": {
+    "document": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["query", "mutate", "txn", "procedure"] },
+        "op": { "$ref": "#/$defs/anyOp" },
+        "statements": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/document" }
+        },
+        "name": { "type": "string" },
+        "onError": { "type": "string", "enum": ["rollback", "abort"], "default": "rollback" }
+      }
+    },
+    "anyOp": {
+      "type": "object",
+      "required": ["op"],
+      "properties": {
+        "op": {
+          "type": "string",
+          "enum": [
+            "scan", "project", "filter", "join", "aggregate", "window",
+            "sort", "limit", "distinct", "setop", "values", "with",
+            "insert", "update", "delete", "merge", "call"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "expr": {
+      "type": "object",
+      "required": ["expr"],
+      "properties": {
+        "expr": {
+          "type": "string",
+          "enum": ["col", "lit", "param", "star", "agg", "bin", "un", "fn"]
+        },
+        "entity": { "type": "string" },
+        "attr": { "type": "string" },
+        "alias": { "type": "string" },
+        "value": {},
+        "index": { "type": "integer" },
+        "fn": { "type": "string" },
+        "op": { "type": "string" },
+        "left": { "$ref": "#/$defs/expr" },
+        "right": { "$ref": "#/$defs/expr" },
+        "input": { "$ref": "#/$defs/expr" },
+        "args": { "type": "array", "items": { "$ref": "#/$defs/expr" } }
+      }
+    }
+  }
+}

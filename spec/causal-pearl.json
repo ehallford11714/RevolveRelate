@@ -1,0 +1,37 @@
+{
+  "title": "Pearl backdoor on Superstore facts",
+  "description": "Declared DAG. Identification is backdoor through Category. GLM odds-ratio and do() CASE run on dummy first, then the same fact RelOps on live. Overlay is never promoted. SLM never writes SQL.",
+  "kind": "pearl",
+  "identification": "backdoor",
+  "criterion": "backdoor",
+  "formula": "Σ_z [E(Y|X=1,Z=z) − E(Y|X=0,Z=z)] P(Z=z)",
+  "assumptions": [
+    "The declared DAG is complete for the observed columns",
+    "Category blocks backdoor paths from Discount to Sales",
+    "Positivity: both treatment levels appear in each used Category",
+    "Consistency: observed Sales at a Discount level is the potential outcome",
+    "No unmeasured confounding given Category"
+  ],
+  "dag": {
+    "nodes": ["Discount", "Sales", "Category", "Region"],
+    "edges": [
+      {"from": "Discount", "to": "Sales"},
+      {"from": "Category", "to": "Discount"},
+      {"from": "Category", "to": "Sales"},
+      {"from": "Region", "to": "Sales"}
+    ]
+  },
+  "treatment": "Discount",
+  "outcome": "Sales",
+  "backdoor": ["Category"],
+  "do": {
+    "composite": "pearl_do_west",
+    "measure": "Discount",
+    "column": "Region",
+    "value": "West",
+    "threshold": 0
+  },
+  "facts": {
+    "composite": "pearl_backdoor_facts"
+  }
+}

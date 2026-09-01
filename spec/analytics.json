@@ -1,0 +1,22 @@
+{
+  "title": "RevolveRelate analytics recipes",
+  "description": "Named RelOp scaffolds. Bind to SchemaGraph primitives, execute on the dummy sandbox, promote the same IR live. Never SQL.",
+  "recipes": [
+    {"id": "sum_by_dimension", "binds": ["measure", "dimension"]},
+    {"id": "count_by_dimension", "binds": ["dimension"]},
+    {"id": "avg_measure", "binds": ["measure"]},
+    {"id": "top_n", "binds": ["measure", "n"]},
+    {"id": "share_of_total", "binds": ["measure", "dimension"]},
+    {"id": "rank_within", "binds": ["measure", "dimension"]},
+    {"id": "having_above", "binds": ["measure", "dimension", "threshold"]},
+    {"id": "multi_group", "binds": ["measure", "dimension", "dimension2"]},
+    {"id": "mix_filter_agg", "binds": ["measure", "dimension", "value", "min"]},
+    {"id": "running_sum", "binds": ["measure", "date"]},
+    {"id": "period_slice", "binds": ["measure", "dimension", "year", "date"]},
+    {"id": "union_segments", "binds": ["dimension", "left", "right"]},
+    {"id": "distinct_dimension", "binds": ["dimension"]},
+    {"id": "coverage_left", "binds": ["dimension"]},
+    {"id": "pareto", "binds": ["measure", "dimension"]},
+    {"id": "column_filter", "binds": ["measure", "column", "value", "n"]}
+  ]
+}

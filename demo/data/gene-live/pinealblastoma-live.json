@@ -1,0 +1,1355 @@
+{
+  "question": "what causes this pinealblastoma genetic etiology",
+  "routed": "causal",
+  "livePath": "C:\\Users\\ehall\\Desktop\\research\\RevolveRelate\\demo\\data\\gene.sqlite",
+  "build": {
+    "status": "complete",
+    "engine": "sqlite"
+  },
+  "bound": {
+    "measure": "Cases",
+    "dimension": "DiseaseName",
+    "column": "Abstract",
+    "treatment": "AssociationScore",
+    "slice": {},
+    "query": "what causes this pinealblastoma genetic etiology"
+  },
+  "schema": {
+    "engine": "sqlite",
+    "dialect": "sqlite",
+    "businessEntities": [
+      {
+        "name": "Disease",
+        "schema": "main",
+        "kind": "table",
+        "comment": "",
+        "attributes": [
+          {
+            "name": "DiseaseId",
+            "type": "INTEGER",
+            "nullable": true,
+            "primaryKey": true,
+            "unique": false,
+            "samples": [],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "DiseaseName",
+            "type": "TEXT",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [
+              "Pineoblastoma",
+              "DICER1 syndrome"
+            ],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "Alias",
+            "type": "TEXT",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [
+              "pinealblastoma pineal blastoma",
+              "dicer1-related tumor predisposition"
+            ],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "Abstract",
+            "type": "TEXT",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [
+              "Pineoblastoma is a pineal parenchymal tumor. It is caused by germline DICER1 mutation or biallelic RB1 loss. DROSHA and DGCR8 mutations also cause the disease because miRNA biogenesis is disrupted. Therefore cases cluster in DICER1 syndrome and heritable retinoblastoma.",
+              "DICER1 syndrome is caused by germline DICER1 loss-of-function. Therefore several rare tumors, including pineoblastoma, appear in carriers."
+            ],
+            "comment": "",
+            "sensitivity": "public"
+          }
+        ]
+      },
+      {
+        "name": "Fasta",
+        "schema": "main",
+        "kind": "table",
+        "comment": "",
+        "attributes": [
+          {
+            "name": "FastaId",
+            "type": "INTEGER",
+            "nullable": true,
+            "primaryKey": true,
+            "unique": false,
+            "samples": [],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "GeneId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "Accession",
+            "type": "TEXT",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [
+              "NP_803187.1",
+              "NP_000312.2",
+              "NP_037367.3",
+              "NP_073557.3"
+            ],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "Header",
+            "type": "TEXT",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [
+              "NP_803187.1 endoribonuclease Dicer isoform 1 [Homo sapiens]",
+              "NP_000312.2 retinoblastoma-associated protein isoform 1 [Homo sapiens]",
+              "NP_037367.3 ribonuclease 3 isoform 1 [Homo sapiens]",
+              "NP_073557.3 microprocessor complex subunit DGCR8 isoform 1 [Homo sapiens]"
+            ],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "Sequence",
+            "type": "TEXT",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [
+              "MKSPALQPLSMAGLQLMTPASSPMGPFFGLPWQQEAIHDNIYTPRKYQVELLEAALDHNTIVCLNTGSGKTFIAVLLTKELSYQIRGDFSRNGKRTVFLVNSANQVAQQVSAVRTHSDLKVGEYSNLEVNASWTKERWNQEFTKHQVLIMTCYVALNVLKNGYLSLSDINLLVFDECHLA",
+              "MPPKTPRKTAATAAAAAAEPPAPPPPPPPEEDPEQDSGPEDLPLVRLEFEETEEPDFTALCQKLKIPDHVRERAWLTWEKVSSVDGVLGGYIQKKKELWGICIFIAAVDLDEMSFTFTELQKNIEISVHKFFNLLKEIDTSTKVDNAMSRLLKKYDVLFALFSKLERTCELIYLTQPSSS",
+              "MMQGNTCHRMSFHPGRGCPRGRGGHGARPSAPSFRPQNLRLLHPQQPPVQYQYEPPSAPSTTFSNSPAPNFLPPRPDFVPFPPPMPPSAQGPLPPCPIRPPFPNHQMRHPFPVPPCFPPMPPPMPCPNNPPVPGAPPGQGTFPFMMPPPSMPHPPPPPVMPQQVNYQYPPGYSHHNFPPP",
+              "METDESPSPLPCGPAGEAVMESRARPFQALPREQSPPPPLQTSSGAEVMDVGSGGDGQSELPAEDPFNFYGASLLSKGSFSKGRLLIDPNCSGHSPRTARHAPAVRKFSPDLKLLKDVKISVSFTESCRSKDRKVLYTGAERDVRAECGLLLSPVSGDVHACPFGGSVGDGVGIGGESAD"
+            ],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "Length",
+            "type": "INTEGER",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "SourceUrl",
+            "type": "TEXT",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [
+              "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=NP_803187.1&rettype=fasta&retmode=text",
+              "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=NP_000312.2&rettype=fasta&retmode=text",
+              "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=NP_037367.3&rettype=fasta&retmode=text",
+              "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=NP_073557.3&rettype=fasta&retmode=text"
+            ],
+            "comment": "",
+            "sensitivity": "public"
+          }
+        ]
+      },
+      {
+        "name": "Gene",
+        "schema": "main",
+        "kind": "table",
+        "comment": "",
+        "attributes": [
+          {
+            "name": "GeneId",
+            "type": "INTEGER",
+            "nullable": true,
+            "primaryKey": true,
+            "unique": false,
+            "samples": [],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "Symbol",
+            "type": "TEXT",
+            "nullable": false,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [
+              "DICER1",
+              "RB1",
+              "DROSHA",
+              "DGCR8"
+            ],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "NcbiGeneId",
+            "type": "TEXT",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [
+              "23405",
+              "5925",
+              "29102",
+              "54487"
+            ],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "Uniprot",
+            "type": "TEXT",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [
+              "Q9UPY3",
+              "P06400",
+              "Q9NRR4",
+              "Q8WYQ5"
+            ],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "Accession",
+            "type": "TEXT",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [
+              "NP_803187.1",
+              "NP_000312.2",
+              "NP_037367.3",
+              "NP_073557.3"
+            ],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "Summary",
+            "type": "TEXT",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [
+              "DICER1 encodes the RNase III that cleaves pre-miRNA. Germline DICER1 mutation causes DICER1 syndrome. Therefore pineoblastoma risk rises when miRNA processing fails.",
+              "RB1 encodes the retinoblastoma pocket protein. Biallelic RB1 loss causes pineoblastoma in heritable retinoblastoma because both copies are inactivated.",
+              "DROSHA is the nuclear RNase III of the microprocessor. Somatic DROSHA mutation causes pineoblastoma because pri-miRNA cleavage fails; therefore let-7/miR-98-5p declines.",
+              "DGCR8 partners with DROSHA. DGCR8 mutation causes pineoblastoma because the microprocessor complex is disrupted."
+            ],
+            "comment": "",
+            "sensitivity": "public"
+          }
+        ]
+      },
+      {
+        "name": "GeneDisease",
+        "schema": "main",
+        "kind": "table",
+        "comment": "",
+        "attributes": [
+          {
+            "name": "LinkId",
+            "type": "INTEGER",
+            "nullable": true,
+            "primaryKey": true,
+            "unique": false,
+            "samples": [],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "GeneId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "DiseaseId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "Role",
+            "type": "TEXT",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [
+              "germline",
+              "biallelic-loss",
+              "somatic"
+            ],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "Evidence",
+            "type": "TEXT",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [
+              "Pineoblastoma is caused by germline DICER1 mutation. Therefore association score is high in DICER1 syndrome pedigrees.",
+              "RB1 loss causes pineoblastoma because both alleles are inactivated in trilateral retinoblastoma.",
+              "DROSHA mutation causes pineoblastoma because microprocessor cleavage fails; therefore miRNA maturation drops.",
+              "DGCR8 mutation causes pineoblastoma because DROSHA cannot bind substrate. Therefore cases co-occur with DROSHA hits.",
+              "DICER1 syndrome is caused by germline DICER1 LoF. Therefore pineoblastoma is one of the associated tumors."
+            ],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "AssociationScore",
+            "type": "REAL",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "Cases",
+            "type": "REAL",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [],
+            "comment": "",
+            "sensitivity": "public"
+          },
+          {
+            "name": "LoFCount",
+            "type": "REAL",
+            "nullable": true,
+            "primaryKey": false,
+            "unique": false,
+            "samples": [],
+            "comment": "",
+            "sensitivity": "public"
+          }
+        ]
+      }
+    ],
+    "virtualOverlay": {
+      "name": "OverlayChunk",
+      "schema": "main",
+      "kind": "overlay",
+      "comment": "RAG overlay. Cue, Role, Text, SourcePk and the other chunk fields. Hash embeddings only.",
+      "attributes": [
+        {
+          "name": "ChunkId",
+          "type": "INTEGER",
+          "nullable": false,
+          "primaryKey": true,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "Entity",
+          "type": "TEXT",
+          "nullable": false,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "SourcePk",
+          "type": "TEXT",
+          "nullable": false,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "Column",
+          "type": "TEXT",
+          "nullable": false,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "Strategy",
+          "type": "TEXT",
+          "nullable": false,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "Ordinal",
+          "type": "INTEGER",
+          "nullable": true,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "Level",
+          "type": "TEXT",
+          "nullable": true,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "Text",
+          "type": "TEXT",
+          "nullable": true,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "Hash",
+          "type": "INTEGER",
+          "nullable": true,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "Norm",
+          "type": "REAL",
+          "nullable": true,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "Vec",
+          "type": "TEXT",
+          "nullable": true,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "Cue",
+          "type": "TEXT",
+          "nullable": true,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "Role",
+          "type": "TEXT",
+          "nullable": true,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "Score",
+          "type": "REAL",
+          "nullable": true,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "ParentId",
+          "type": "INTEGER",
+          "nullable": true,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "Model",
+          "type": "TEXT",
+          "nullable": true,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        },
+        {
+          "name": "Dim",
+          "type": "INTEGER",
+          "nullable": true,
+          "primaryKey": false,
+          "unique": false,
+          "samples": [],
+          "comment": "",
+          "sensitivity": "public"
+        }
+      ]
+    },
+    "relationships": [
+      {
+        "name": "Fasta.GeneId->Gene",
+        "from": "Fasta",
+        "fromAttrs": [
+          "GeneId"
+        ],
+        "to": "Gene",
+        "toAttrs": [
+          "GeneId"
+        ],
+        "kind": "foreign_key",
+        "cardinality": "n:1"
+      },
+      {
+        "name": "GeneDisease.DiseaseId->Disease",
+        "from": "GeneDisease",
+        "fromAttrs": [
+          "DiseaseId"
+        ],
+        "to": "Disease",
+        "toAttrs": [
+          "DiseaseId"
+        ],
+        "kind": "foreign_key",
+        "cardinality": "n:1"
+      },
+      {
+        "name": "GeneDisease.GeneId->Gene",
+        "from": "GeneDisease",
+        "fromAttrs": [
+          "GeneId"
+        ],
+        "to": "Gene",
+        "toAttrs": [
+          "GeneId"
+        ],
+        "kind": "foreign_key",
+        "cardinality": "n:1"
+      }
+    ],
+    "card": "TABLES\nDisease: DiseaseId:INTEGER, DiseaseName:TEXT, Alias:TEXT, Abstract:TEXT\nFasta: FastaId:INTEGER, GeneId:INTEGER, Accession:TEXT, Header:TEXT, Sequence:TEXT, Length:INTEGER, SourceUrl:TEXT\nGene: GeneId:INTEGER, Symbol:TEXT, NcbiGeneId:TEXT, Uniprot:TEXT, Accession:TEXT, Summary:TEXT\nGeneDisease: LinkId:INTEGER, GeneId:INTEGER, DiseaseId:INTEGER, Role:TEXT, Evidence:TEXT, AssociationScore:REAL, Cases:REAL, LoFCount:REAL\nFKs\nFasta.GeneId->Gene\nGeneDisease.DiseaseId->Disease\nGeneDisease.GeneId->Gene",
+    "measures": [
+      "Length",
+      "AssociationScore",
+      "Cases",
+      "LoFCount"
+    ],
+    "dimensions": [
+      "DiseaseName",
+      "Alias",
+      "Abstract",
+      "Accession",
+      "Header",
+      "Sequence",
+      "SourceUrl",
+      "Symbol",
+      "NcbiGeneId",
+      "Uniprot",
+      "Accession",
+      "Summary",
+      "Role",
+      "Evidence"
+    ],
+    "kpis": [
+      {
+        "id": "cases_by_gene",
+        "title": "Reported cases summed by gene symbol",
+        "recipe": "sum_by_dimension",
+        "args": {
+          "measure": "Cases",
+          "dimension": "Symbol"
+        },
+        "available": true,
+        "domain": "gene"
+      },
+      {
+        "id": "share_of_cases",
+        "title": "Each gene's share of reported cases",
+        "recipe": "share_of_total",
+        "args": {
+          "measure": "Cases",
+          "dimension": "Symbol"
+        },
+        "available": true,
+        "domain": "gene"
+      },
+      {
+        "id": "association_by_disease",
+        "title": "Association score by disease name",
+        "recipe": "sum_by_dimension",
+        "args": {
+          "measure": "AssociationScore",
+          "dimension": "DiseaseName"
+        },
+        "available": true,
+        "domain": "gene"
+      },
+      {
+        "id": "lof_by_gene",
+        "title": "Loss-of-function count by gene",
+        "recipe": "sum_by_dimension",
+        "args": {
+          "measure": "LoFCount",
+          "dimension": "Symbol"
+        },
+        "available": true,
+        "domain": "gene"
+      },
+      {
+        "id": "top_association",
+        "title": "Top gene-disease association rows",
+        "recipe": "top_n",
+        "args": {
+          "measure": "AssociationScore",
+          "n": 8
+        },
+        "available": true,
+        "domain": "gene"
+      }
+    ],
+    "overlay": {
+      "entity": "OverlayChunk",
+      "chunks": 2184,
+      "fields": [
+        "ChunkId",
+        "Entity",
+        "SourcePk",
+        "Column",
+        "Strategy",
+        "Ordinal",
+        "Level",
+        "Text",
+        "Hash",
+        "Norm",
+        "Vec",
+        "Cue",
+        "Role",
+        "Score",
+        "ParentId",
+        "Model",
+        "Dim"
+      ],
+      "textColumns": [
+        {
+          "entity": "Disease",
+          "column": "DiseaseName"
+        },
+        {
+          "entity": "Disease",
+          "column": "Alias"
+        },
+        {
+          "entity": "Disease",
+          "column": "Abstract"
+        },
+        {
+          "entity": "Fasta",
+          "column": "Accession"
+        },
+        {
+          "entity": "Fasta",
+          "column": "Header"
+        },
+        {
+          "entity": "Fasta",
+          "column": "Sequence"
+        },
+        {
+          "entity": "Fasta",
+          "column": "SourceUrl"
+        },
+        {
+          "entity": "Gene",
+          "column": "Symbol"
+        },
+        {
+          "entity": "Gene",
+          "column": "NcbiGeneId"
+        },
+        {
+          "entity": "Gene",
+          "column": "Uniprot"
+        },
+        {
+          "entity": "Gene",
+          "column": "Accession"
+        },
+        {
+          "entity": "Gene",
+          "column": "Summary"
+        },
+        {
+          "entity": "GeneDisease",
+          "column": "Role"
+        },
+        {
+          "entity": "GeneDisease",
+          "column": "Evidence"
+        }
+      ],
+      "hint": "Dummy chunks non-PII text (and staging notes). Live promote rebuilds the same fields from live text only."
+    },
+    "policyAttributes": {
+      "Disease.DiseaseId": "public",
+      "Disease.DiseaseName": "public",
+      "Disease.Alias": "public",
+      "Disease.Abstract": "public",
+      "Fasta.FastaId": "public",
+      "Fasta.GeneId": "public",
+      "Fasta.Accession": "public",
+      "Fasta.Header": "public",
+      "Fasta.Sequence": "public",
+      "Fasta.Length": "public",
+      "Fasta.SourceUrl": "public",
+      "Gene.GeneId": "public",
+      "Gene.Symbol": "public",
+      "Gene.NcbiGeneId": "public",
+      "Gene.Uniprot": "public",
+      "Gene.Accession": "public",
+      "Gene.Summary": "public",
+      "GeneDisease.LinkId": "public",
+      "GeneDisease.GeneId": "public",
+      "GeneDisease.DiseaseId": "public",
+      "GeneDisease.Role": "public",
+      "GeneDisease.Evidence": "public",
+      "GeneDisease.AssociationScore": "public",
+      "GeneDisease.Cases": "public",
+      "GeneDisease.LoFCount": "public"
+    },
+    "allEntitiesExcludesOverlay": true
+  },
+  "causal": {
+    "composite": "rag_causal_pair",
+    "goal": {
+      "measure": "Cases",
+      "dimension": "DiseaseName",
+      "slice": {},
+      "column": "Abstract",
+      "treatment": "AssociationScore"
+    },
+    "grammar": {
+      "ok": true,
+      "depth": 5,
+      "issues": [],
+      "ranks": [
+        10,
+        46,
+        48,
+        48,
+        0
+      ]
+    },
+    "dummyStatus": "sandbox_ok",
+    "dummyColumns": [
+      "CauseText",
+      "EffectText",
+      "Cue",
+      "SourcePk",
+      "Entity",
+      "Column",
+      "CauseRole",
+      "EffectRole"
+    ],
+    "dummyRows": [],
+    "dummyRowCount": 0,
+    "live": {
+      "ran": true,
+      "target": "live",
+      "sql": "WITH \"CausalHits\" AS (SELECT \"OverlayChunk\".\"Text\" AS \"Text\", \"OverlayChunk\".\"SourcePk\" AS \"SourcePk\", \"OverlayChunk\".\"Entity\" AS \"Entity\", \"OverlayChunk\".\"Column\" AS \"Column\", \"OverlayChunk\".\"Strategy\" AS \"Strategy\", \"OverlayChunk\".\"Role\" AS \"Role\", \"OverlayChunk\".\"Cue\" AS \"Cue\", \"OverlayChunk\".\"ParentId\" AS \"ParentId\", \"OverlayChunk\".\"Hash\" AS \"Hash\", ABS(\"OverlayChunk\".\"Hash\" - ?) AS \"dist\" FROM \"OverlayChunk\" AS \"OverlayChunk\" WHERE \"OverlayChunk\".\"Column\" = ? AND \"OverlayChunk\".\"Column\" = ? AND \"OverlayChunk\".\"Strategy\" = ? AND \"OverlayChunk\".\"Column\" = ? ORDER BY \"dist\" ASC LIMIT 8), \"Cause\" AS (SELECT * FROM \"CausalHits\" AS \"CausalHits\" WHERE \"CausalHits\".\"Role\" = ?), \"Effect\" AS (SELECT * FROM \"CausalHits\" AS \"CausalHits\" WHERE \"CausalHits\".\"Role\" = ?), \"Pairs\" AS (SELECT \"Cause\".\"Text\" AS \"CauseText\", \"Effect\".\"Text\" AS \"EffectText\", \"Cause\".\"Cue\" AS \"Cue\", \"Cause\".\"SourcePk\" AS \"SourcePk\", \"Cause\".\"Entity\" AS \"Entity\", \"Cause\".\"Column\" AS \"Column\", \"Cause\".\"Role\" AS \"CauseRole\", \"Effect\".\"Role\" AS \"EffectRole\" FROM \"Cause\" AS \"Cause\" INNER JOIN \"Effect\" AS \"Effect\" ON \"Cause\".\"SourcePk\" = \"Effect\".\"SourcePk\" AND \"Cause\".\"Cue\" = \"Effect\".\"Cue\") SELECT * FROM \"Pairs\" AS \"Pairs\"",
+      "columns": [
+        "CauseText",
+        "EffectText",
+        "Cue",
+        "SourcePk",
+        "Entity",
+        "Column",
+        "CauseRole",
+        "EffectRole"
+      ],
+      "rows": [
+        [
+          "miRNA biogenesis is disrupted.",
+          "DROSHA and DGCR8 mutations also cause the disease",
+          "because",
+          "1",
+          "Disease",
+          "Abstract",
+          "cause",
+          "effect"
+        ],
+        [
+          "DICER1 syndrome is",
+          "by germline DICER1 loss-of-function.",
+          "caused",
+          "2",
+          "Disease",
+          "Abstract",
+          "cause",
+          "effect"
+        ]
+      ],
+      "rowCount": 2
+    }
+  },
+  "kpi_cases_by_gene": {
+    "status": "sandbox_ok",
+    "columns": [
+      "Symbol",
+      "value"
+    ],
+    "rows": [
+      [
+        "DGCR8",
+        12.0
+      ],
+      [
+        "DROSHA",
+        10.0
+      ],
+      [
+        "RB1",
+        8.0
+      ],
+      [
+        "DICER1",
+        6.0
+      ]
+    ],
+    "live": {
+      "ran": true,
+      "target": "live",
+      "sql": "SELECT \"Gene\".\"Symbol\", SUM(\"GeneDisease\".\"Cases\") AS \"value\" FROM \"GeneDisease\" AS \"GeneDisease\" INNER JOIN \"Gene\" AS \"Gene\" ON \"GeneDisease\".\"GeneId\" = \"Gene\".\"GeneId\" GROUP BY \"Gene\".\"Symbol\" ORDER BY \"value\" DESC",
+      "columns": [
+        "Symbol",
+        "value"
+      ],
+      "rows": [
+        [
+          "DICER1",
+          68.0
+        ],
+        [
+          "RB1",
+          17.0
+        ],
+        [
+          "DROSHA",
+          12.0
+        ],
+        [
+          "DGCR8",
+          8.0
+        ]
+      ],
+      "rowCount": 4
+    }
+  },
+  "dummyCausalOverlay": {
+    "columns": [
+      "Entity",
+      "Column",
+      "Strategy",
+      "Cue",
+      "Role",
+      "substr(Text,1,160)"
+    ],
+    "rows": [
+      [
+        "Disease",
+        "Abstract",
+        "causal",
+        "therefore",
+        "effect",
+        "cases cluster in DICER1 syndrome and heritable retinoblastoma."
+      ],
+      [
+        "Disease",
+        "Abstract",
+        "causal",
+        "therefore",
+        "cause",
+        "several rare tumors"
+      ],
+      [
+        "Disease",
+        "Abstract",
+        "causal",
+        "therefore",
+        "effect",
+        "including pineoblastoma, appear in carriers."
+      ],
+      [
+        "Disease",
+        "Abstract",
+        "causal",
+        "therefore",
+        "effect",
+        "cases cluster in DICER1 syndrome and heritable retinoblastoma."
+      ],
+      [
+        "Disease",
+        "Abstract",
+        "causal",
+        "therefore",
+        "cause",
+        "several rare tumors"
+      ],
+      [
+        "Disease",
+        "Abstract",
+        "causal",
+        "therefore",
+        "effect",
+        "including pineoblastoma, appear in carriers."
+      ],
+      [
+        "Disease",
+        "Abstract",
+        "causal",
+        "therefore",
+        "effect",
+        "cases cluster in DICER1 syndrome and heritable retinoblastoma."
+      ],
+      [
+        "Disease",
+        "Abstract",
+        "causal",
+        "therefore",
+        "cause",
+        "several rare tumors"
+      ],
+      [
+        "Disease",
+        "Abstract",
+        "causal",
+        "therefore",
+        "effect",
+        "including pineoblastoma, appear in carriers."
+      ],
+      [
+        "Disease",
+        "Abstract",
+        "causal",
+        "therefore",
+        "effect",
+        "cases cluster in DICER1 syndrome and heritable retinoblastoma."
+      ],
+      [
+        "Disease",
+        "Abstract",
+        "causal",
+        "therefore",
+        "cause",
+        "several rare tumors"
+      ],
+      [
+        "Disease",
+        "Abstract",
+        "causal",
+        "therefore",
+        "effect",
+        "including pineoblastoma, appear in carriers."
+      ],
+      [
+        "Gene",
+        "Summary",
+        "causal",
+        "therefore",
+        "effect",
+        "pineoblastoma risk rises when miRNA processing fails."
+      ],
+      [
+        "Gene",
+        "Summary",
+        "causal",
+        "therefore",
+        "cause",
+        "Somatic DROSHA mutation causes pineoblastoma because pri-miRNA cleavage fails;"
+      ],
+      [
+        "Gene",
+        "Summary",
+        "causal",
+        "therefore",
+        "effect",
+        "let-7/miR-98-5p declines."
+      ],
+      [
+        "Gene",
+        "Summary",
+        "causal",
+        "therefore",
+        "effect",
+        "pineoblastoma risk rises when miRNA processing fails."
+      ],
+      [
+        "Gene",
+        "Summary",
+        "causal",
+        "therefore",
+        "cause",
+        "Somatic DROSHA mutation causes pineoblastoma because pri-miRNA cleavage fails;"
+      ],
+      [
+        "Gene",
+        "Summary",
+        "causal",
+        "therefore",
+        "effect",
+        "let-7/miR-98-5p declines."
+      ],
+      [
+        "GeneDisease",
+        "Evidence",
+        "causal",
+        "therefore",
+        "effect",
+        "association score is high in DICER1 syndrome pedigrees."
+      ],
+      [
+        "GeneDisease",
+        "Evidence",
+        "causal",
+        "therefore",
+        "cause",
+        "DROSHA mutation causes pineoblastoma because microprocessor cleavage fails;"
+      ],
+      [
+        "GeneDisease",
+        "Evidence",
+        "causal",
+        "therefore",
+        "effect",
+        "miRNA maturation drops."
+      ],
+      [
+        "GeneDisease",
+        "Evidence",
+        "causal",
+        "therefore",
+        "effect",
+        "cases co-occur with DROSHA hits."
+      ],
+      [
+        "GeneDisease",
+        "Evidence",
+        "causal",
+        "therefore",
+        "effect",
+        "pineoblastoma is one of the associated tumors."
+      ],
+      [
+        "GeneDisease",
+        "Evidence",
+        "causal",
+        "therefore",
+        "effect",
+        "association score is high in DICER1 syndrome pedigrees."
+      ]
+    ]
+  },
+  "liveTables": {
+    "Gene": {
+      "columns": [
+        "GeneId",
+        "Symbol",
+        "NcbiGeneId",
+        "Uniprot",
+        "Accession",
+        "Summary"
+      ],
+      "rows": [
+        [
+          1,
+          "DICER1",
+          "23405",
+          "Q9UPY3",
+          "NP_803187.1",
+          "DICER1 encodes the RNase III that cleaves pre-miRNA. Germline DICER1 mutation causes DICER1 syndrome. Therefore pineoblastoma risk rises when miRNA processing fails."
+        ],
+        [
+          2,
+          "RB1",
+          "5925",
+          "P06400",
+          "NP_000312.2",
+          "RB1 encodes the retinoblastoma pocket protein. Biallelic RB1 loss causes pineoblastoma in heritable retinoblastoma because both copies are inactivated."
+        ],
+        [
+          3,
+          "DROSHA",
+          "29102",
+          "Q9NRR4",
+          "NP_037367.3",
+          "DROSHA is the nuclear RNase III of the microprocessor. Somatic DROSHA mutation causes pineoblastoma because pri-miRNA cleavage fails; therefore let-7/miR-98-5p declines."
+        ],
+        [
+          4,
+          "DGCR8",
+          "54487",
+          "Q8WYQ5",
+          "NP_073557.3",
+          "DGCR8 partners with DROSHA. DGCR8 mutation causes pineoblastoma because the microprocessor complex is disrupted."
+        ]
+      ]
+    },
+    "Disease": {
+      "columns": [
+        "DiseaseId",
+        "DiseaseName",
+        "Alias",
+        "Abstract"
+      ],
+      "rows": [
+        [
+          1,
+          "Pineoblastoma",
+          "pinealblastoma pineal blastoma",
+          "Pineoblastoma is a pineal parenchymal tumor. It is caused by germline DICER1 mutation or biallelic RB1 loss. DROSHA and DGCR8 mutations also cause the disease because miRNA biogenesis is disrupted. Therefore cases cluster in DICER1 syndrome and heritable retinoblastoma."
+        ],
+        [
+          2,
+          "DICER1 syndrome",
+          "dicer1-related tumor predisposition",
+          "DICER1 syndrome is caused by germline DICER1 loss-of-function. Therefore several rare tumors, including pineoblastoma, appear in carriers."
+        ]
+      ]
+    },
+    "GeneDisease": {
+      "columns": [
+        "LinkId",
+        "GeneId",
+        "DiseaseId",
+        "Role",
+        "Evidence",
+        "AssociationScore",
+        "Cases",
+        "LoFCount"
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          1,
+          "germline",
+          "Pineoblastoma is caused by germline DICER1 mutation. Therefore association score is high in DICER1 syndrome pedigrees.",
+          0.92,
+          28.0,
+          11.0
+        ],
+        [
+          2,
+          2,
+          1,
+          "biallelic-loss",
+          "RB1 loss causes pineoblastoma because both alleles are inactivated in trilateral retinoblastoma.",
+          0.81,
+          17.0,
+          9.0
+        ],
+        [
+          3,
+          3,
+          1,
+          "somatic",
+          "DROSHA mutation causes pineoblastoma because microprocessor cleavage fails; therefore miRNA maturation drops.",
+          0.74,
+          12.0,
+          6.0
+        ],
+        [
+          4,
+          4,
+          1,
+          "somatic",
+          "DGCR8 mutation causes pineoblastoma because DROSHA cannot bind substrate. Therefore cases co-occur with DROSHA hits.",
+          0.69,
+          8.0,
+          4.0
+        ],
+        [
+          5,
+          1,
+          2,
+          "germline",
+          "DICER1 syndrome is caused by germline DICER1 LoF. Therefore pineoblastoma is one of the associated tumors.",
+          0.95,
+          40.0,
+          14.0
+        ]
+      ]
+    },
+    "Fasta": {
+      "columns": [
+        "FastaId",
+        "GeneId",
+        "Accession",
+        "Header",
+        "Sequence",
+        "Length",
+        "SourceUrl"
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          "NP_803187.1",
+          "NP_803187.1 endoribonuclease Dicer isoform 1 [Homo sapiens]",
+          "MKSPALQPLSMAGLQLMTPASSPMGPFFGLPWQQEAIHDN\u2026 (180 aa)",
+          180,
+          "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=NP_803187.1&rettype=fasta&retmode=text"
+        ],
+        [
+          2,
+          2,
+          "NP_000312.2",
+          "NP_000312.2 retinoblastoma-associated protein isoform 1 [Homo sapiens]",
+          "MPPKTPRKTAATAAAAAAEPPAPPPPPPPEEDPEQDSGPE\u2026 (180 aa)",
+          180,
+          "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=NP_000312.2&rettype=fasta&retmode=text"
+        ],
+        [
+          3,
+          3,
+          "NP_037367.3",
+          "NP_037367.3 ribonuclease 3 isoform 1 [Homo sapiens]",
+          "MMQGNTCHRMSFHPGRGCPRGRGGHGARPSAPSFRPQNLR\u2026 (180 aa)",
+          180,
+          "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=NP_037367.3&rettype=fasta&retmode=text"
+        ],
+        [
+          4,
+          4,
+          "NP_073557.3",
+          "NP_073557.3 microprocessor complex subunit DGCR8 isoform 1 [Homo sapiens]",
+          "METDESPSPLPCGPAGEAVMESRARPFQALPREQSPPPPL\u2026 (180 aa)",
+          180,
+          "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=NP_073557.3&rettype=fasta&retmode=text"
+        ]
+      ]
+    }
+  },
+  "mcpQuestion": {
+    "routed": "causal",
+    "mode": "causal",
+    "goal": {
+      "measure": "Cases",
+      "dimension": "DiseaseName",
+      "slice": {},
+      "column": "Abstract",
+      "treatment": "AssociationScore"
+    },
+    "relop": {
+      "status": "sandbox_ok",
+      "sql": "WITH \"CausalHits\" AS (SELECT \"OverlayChunk\".\"Text\" AS \"Text\", \"OverlayChunk\".\"SourcePk\" AS \"SourcePk\", \"OverlayChunk\".\"Entity\" AS \"Entity\", \"OverlayChunk\".\"Column\" AS \"Column\", \"OverlayChunk\".\"Strategy\" AS \"Strategy\", \"OverlayChunk\".\"Role\" AS \"Role\", \"OverlayChunk\".\"Cue\" AS \"Cue\", \"OverlayChunk\".\"ParentId\" AS \"ParentId\", \"OverlayChunk\".\"Hash\" AS \"Hash\", ABS(\"OverlayChunk\".\"Hash\" - ?) AS \"dist\" FROM \"OverlayChunk\" AS \"OverlayChunk\" WHERE \"OverlayChunk\".\"Column\" = ? AND \"OverlayChunk\".\"Column\" = ? AND \"OverlayChunk\".\"Strategy\" = ? AND \"OverlayChunk\".\"Column\" = ? ORDER BY \"dist\" ASC LIMIT 8), \"Cause\" AS (SELECT * FROM \"CausalHits\" AS \"CausalHits\" WHERE \"CausalHits\".\"Role\" = ?), \"Effect\" AS (SELECT * FROM \"CausalHits\" AS \"CausalHits\" WHERE \"CausalHits\".\"Role\" = ?), \"Pairs\" AS (SELECT \"Cause\".\"Text\" AS \"CauseText\", \"Effect\".\"Text\" AS \"EffectText\", \"Cause\".\"Cue\" AS \"Cue\", \"Cause\".\"SourcePk\" AS \"SourcePk\", \"Cause\".\"Entity\" AS \"Entity\", \"Cause\".\"Column\" AS \"Column\", \"Cause\".\"Role\" AS \"CauseRole\", \"Effect\".\"Role\" AS \"EffectRole\" FROM \"Cause\" AS \"Cause\" INNER JOIN \"Effect\" AS \"Effect\" ON \"Cause\".\"SourcePk\" = \"Effect\".\"SourcePk\" AND \"Cause\".\"Cue\" = \"Effect\".\"Cue\") SELECT * FROM \"Pairs\" AS \"Pairs\"",
+      "columns": [
+        "CauseText",
+        "EffectText",
+        "Cue",
+        "SourcePk",
+        "Entity",
+        "Column",
+        "CauseRole",
+        "EffectRole"
+      ],
+      "rowCount": 0
+    },
+    "live": {
+      "ran": true,
+      "target": "live",
+      "sql": "WITH \"CausalHits\" AS (SELECT \"OverlayChunk\".\"Text\" AS \"Text\", \"OverlayChunk\".\"SourcePk\" AS \"SourcePk\", \"OverlayChunk\".\"Entity\" AS \"Entity\", \"OverlayChunk\".\"Column\" AS \"Column\", \"OverlayChunk\".\"Strategy\" AS \"Strategy\", \"OverlayChunk\".\"Role\" AS \"Role\", \"OverlayChunk\".\"Cue\" AS \"Cue\", \"OverlayChunk\".\"ParentId\" AS \"ParentId\", \"OverlayChunk\".\"Hash\" AS \"Hash\", ABS(\"OverlayChunk\".\"Hash\" - ?) AS \"dist\" FROM \"OverlayChunk\" AS \"OverlayChunk\" WHERE \"OverlayChunk\".\"Column\" = ? AND \"OverlayChunk\".\"Column\" = ? AND \"OverlayChunk\".\"Strategy\" = ? AND \"OverlayChunk\".\"Column\" = ? ORDER BY \"dist\" ASC LIMIT 8), \"Cause\" AS (SELECT * FROM \"CausalHits\" AS \"CausalHits\" WHERE \"CausalHits\".\"Role\" = ?), \"Effect\" AS (SELECT * FROM \"CausalHits\" AS \"CausalHits\" WHERE \"CausalHits\".\"Role\" = ?), \"Pairs\" AS (SELECT \"Cause\".\"Text\" AS \"CauseText\", \"Effect\".\"Text\" AS \"EffectText\", \"Cause\".\"Cue\" AS \"Cue\", \"Cause\".\"SourcePk\" AS \"SourcePk\", \"Cause\".\"Entity\" AS \"Entity\", \"Cause\".\"Column\" AS \"Column\", \"Cause\".\"Role\" AS \"CauseRole\", \"Effect\".\"Role\" AS \"EffectRole\" FROM \"Cause\" AS \"Cause\" INNER JOIN \"Effect\" AS \"Effect\" ON \"Cause\".\"SourcePk\" = \"Effect\".\"SourcePk\" AND \"Cause\".\"Cue\" = \"Effect\".\"Cue\") SELECT * FROM \"Pairs\" AS \"Pairs\"",
+      "columns": [
+        "CauseText",
+        "EffectText",
+        "Cue",
+        "SourcePk",
+        "Entity",
+        "Column",
+        "CauseRole",
+        "EffectRole"
+      ],
+      "rows": [
+        [
+          "miRNA biogenesis is disrupted.",
+          "DROSHA and DGCR8 mutations also cause the disease",
+          "because",
+          "1",
+          "Disease",
+          "Abstract",
+          "cause",
+          "effect"
+        ],
+        [
+          "DICER1 syndrome is",
+          "by germline DICER1 loss-of-function.",
+          "caused",
+          "2",
+          "Disease",
+          "Abstract",
+          "cause",
+          "effect"
+        ]
+      ],
+      "rowCount": 2
+    },
+    "error": null
+  },
+  "honesty": "Bound RelOp + public NCBI FASTA/abstracts. Not a claim that RevolveRelate discovered pineoblastoma etiology."
+}

@@ -1,0 +1,40 @@
+{
+  "name": "aggregate",
+  "ir": {
+    "kind": "query",
+    "op": {
+      "op": "limit",
+      "count": 10,
+      "input": {
+        "op": "sort",
+        "keys": [{ "expr": { "expr": "col", "attr": "n" }, "direction": "DESC" }],
+        "input": {
+          "op": "aggregate",
+          "groups": [{ "expr": "col", "entity": "Invoice", "attr": "CustomerId" }],
+          "aggs": [
+            { "expr": { "expr": "agg", "fn": "count", "input": { "expr": "star" } }, "alias": "n" }
+          ],
+          "input": { "op": "scan", "entity": "Invoice", "alias": "Invoice" }
+        }
+      }
+    }
+  },
+  "sql": {
+    "postgres": "SELECT \"Invoice\".\"CustomerId\", COUNT(*) AS \"n\" FROM \"Invoice\" AS \"Invoice\" GROUP BY \"Invoice\".\"CustomerId\" ORDER BY \"n\" DESC LIMIT 10",
+    "sqlite": "SELECT \"Invoice\".\"CustomerId\", COUNT(*) AS \"n\" FROM \"Invoice\" AS \"Invoice\" GROUP BY \"Invoice\".\"CustomerId\" ORDER BY \"n\" DESC LIMIT 10",
+    "duckdb": "SELECT \"Invoice\".\"CustomerId\", COUNT(*) AS \"n\" FROM \"Invoice\" AS \"Invoice\" GROUP BY \"Invoice\".\"CustomerId\" ORDER BY \"n\" DESC LIMIT 10",
+    "mysql": "SELECT `Invoice`.`CustomerId`, COUNT(*) AS `n` FROM `Invoice` AS `Invoice` GROUP BY `Invoice`.`CustomerId` ORDER BY `n` DESC LIMIT 10",
+    "tds": "SELECT TOP 10 [Invoice].[CustomerId], COUNT(*) AS [n] FROM [Invoice] AS [Invoice] GROUP BY [Invoice].[CustomerId] ORDER BY [n] DESC",
+    "snowflake": "SELECT \"Invoice\".\"CustomerId\", COUNT(*) AS \"n\" FROM \"Invoice\" AS \"Invoice\" GROUP BY \"Invoice\".\"CustomerId\" ORDER BY \"n\" DESC LIMIT 10",
+    "bigquery": "SELECT `Invoice`.`CustomerId`, COUNT(*) AS `n` FROM `Invoice` AS `Invoice` GROUP BY `Invoice`.`CustomerId` ORDER BY `n` DESC LIMIT 10"
+  },
+  "params": {
+    "postgres": [],
+    "sqlite": [],
+    "duckdb": [],
+    "mysql": [],
+    "tds": [],
+    "snowflake": [],
+    "bigquery": []
+  }
+}

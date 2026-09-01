@@ -1,0 +1,3062 @@
+{
+  "version": 1,
+  "engines": [
+    {
+      "id": "postgresql",
+      "family": "sql",
+      "aliases": [
+        "postgres",
+        "pgsql"
+      ],
+      "schemes": [
+        "postgresql",
+        "postgres"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [
+        "predicate_pushdown",
+        "index_aware_joins",
+        "limit_early"
+      ],
+      "description": "PostgreSQL",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "A",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "mysql",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "mysql"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "mysql",
+      "readonlySession": [
+        "SET SESSION TRANSACTION READ ONLY"
+      ],
+      "optimizer": [
+        "predicate_pushdown",
+        "index_aware_joins",
+        "limit_early"
+      ],
+      "description": "MySQL",
+      "emitFamily": "mysql",
+      "placeholder": "question",
+      "executeTier": "A",
+      "connectionFamily": "mysql"
+    },
+    {
+      "id": "mariadb",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "mariadb",
+        "mysql"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "mysql",
+      "readonlySession": [
+        "SET SESSION TRANSACTION READ ONLY"
+      ],
+      "optimizer": [
+        "predicate_pushdown",
+        "index_aware_joins",
+        "limit_early"
+      ],
+      "description": "MariaDB",
+      "emitFamily": "mysql",
+      "placeholder": "question",
+      "executeTier": "A",
+      "connectionFamily": "mysql"
+    },
+    {
+      "id": "sqlite",
+      "family": "sql",
+      "aliases": [
+        "sqlite3"
+      ],
+      "schemes": [
+        "sqlite"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "sqlite",
+      "readonlySession": [
+        "PRAGMA query_only = ON"
+      ],
+      "optimizer": [
+        "predicate_pushdown",
+        "index_aware_joins",
+        "limit_early"
+      ],
+      "description": "SQLite",
+      "emitFamily": "sqlite",
+      "placeholder": "question",
+      "executeTier": "A",
+      "connectionFamily": "sqlite"
+    },
+    {
+      "id": "sqlserver",
+      "family": "sql",
+      "aliases": [
+        "mssql",
+        "sql_server"
+      ],
+      "schemes": [
+        "mssql",
+        "sqlserver"
+      ],
+      "quoting": "bracket",
+      "limitStyle": "top",
+      "introspect": "mssql",
+      "readonlySession": [
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [
+        "predicate_pushdown",
+        "index_aware_joins",
+        "limit_early"
+      ],
+      "description": "Microsoft SQL Server",
+      "emitFamily": "tds",
+      "placeholder": "at",
+      "executeTier": "A",
+      "connectionFamily": "tds"
+    },
+    {
+      "id": "oracle",
+      "family": "sql",
+      "aliases": [
+        "oracledb"
+      ],
+      "schemes": [
+        "oracle"
+      ],
+      "quoting": "double",
+      "limitStyle": "fetch",
+      "introspect": "oracle",
+      "readonlySession": [
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [
+        "predicate_pushdown",
+        "index_aware_joins",
+        "limit_early"
+      ],
+      "description": "Oracle Database",
+      "emitFamily": "oracle",
+      "placeholder": "colon",
+      "executeTier": "B",
+      "connectionFamily": "oracle"
+    },
+    {
+      "id": "db2",
+      "family": "sql",
+      "aliases": [
+        "ibm_db2"
+      ],
+      "schemes": [
+        "db2"
+      ],
+      "quoting": "double",
+      "limitStyle": "fetch",
+      "introspect": "db2",
+      "readonlySession": [],
+      "optimizer": [
+        "predicate_pushdown",
+        "index_aware_joins",
+        "limit_early"
+      ],
+      "description": "IBM Db2",
+      "emitFamily": "oracle",
+      "placeholder": "colon",
+      "executeTier": "B",
+      "connectionFamily": "oracle"
+    },
+    {
+      "id": "sap_hana",
+      "family": "sql",
+      "aliases": [
+        "hana"
+      ],
+      "schemes": [
+        "hana"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "predicate_pushdown",
+        "index_aware_joins",
+        "limit_early"
+      ],
+      "description": "SAP HANA",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "B",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "firebird",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "firebird"
+      ],
+      "quoting": "double",
+      "limitStyle": "fetch",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "predicate_pushdown",
+        "index_aware_joins",
+        "limit_early"
+      ],
+      "description": "Firebird",
+      "emitFamily": "oracle",
+      "placeholder": "colon",
+      "executeTier": "C",
+      "connectionFamily": "oracle"
+    },
+    {
+      "id": "informix",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "informix"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "predicate_pushdown",
+        "index_aware_joins",
+        "limit_early"
+      ],
+      "description": "IBM Informix",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "sybase_ase",
+      "family": "sql",
+      "aliases": [
+        "ase",
+        "sybase"
+      ],
+      "schemes": [
+        "sybase"
+      ],
+      "quoting": "bracket",
+      "limitStyle": "top",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "SAP ASE / Sybase",
+      "emitFamily": "tds",
+      "placeholder": "at",
+      "executeTier": "C",
+      "connectionFamily": "tds"
+    },
+    {
+      "id": "sybase_iq",
+      "family": "warehouse",
+      "aliases": [
+        "iq"
+      ],
+      "schemes": [
+        "sybaseiq"
+      ],
+      "quoting": "bracket",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "SAP IQ",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "warehouse"
+    },
+    {
+      "id": "access",
+      "family": "sql",
+      "aliases": [
+        "msaccess"
+      ],
+      "schemes": [
+        "access"
+      ],
+      "quoting": "bracket",
+      "limitStyle": "top",
+      "introspect": "access",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Microsoft Access",
+      "emitFamily": "tds",
+      "placeholder": "at",
+      "executeTier": "C",
+      "connectionFamily": "tds"
+    },
+    {
+      "id": "h2",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "h2"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "predicate_pushdown",
+        "index_aware_joins",
+        "limit_early"
+      ],
+      "description": "H2",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "hsqldb",
+      "family": "sql",
+      "aliases": [
+        "hsql"
+      ],
+      "schemes": [
+        "hsqldb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "HyperSQL",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "derby",
+      "family": "sql",
+      "aliases": [
+        "javadb"
+      ],
+      "schemes": [
+        "derby"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Apache Derby",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "cockroachdb",
+      "family": "sql",
+      "aliases": [
+        "cockroach"
+      ],
+      "schemes": [
+        "cockroach"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [
+        "predicate_pushdown",
+        "index_aware_joins",
+        "limit_early"
+      ],
+      "description": "CockroachDB",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "A",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "yugabytedb",
+      "family": "sql",
+      "aliases": [
+        "yugabyte"
+      ],
+      "schemes": [
+        "yugabyte"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "YugabyteDB",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "C",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "tidb",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "tidb"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "mysql",
+      "readonlySession": [
+        "SET SESSION TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "TiDB",
+      "emitFamily": "mysql",
+      "placeholder": "question",
+      "executeTier": "A",
+      "connectionFamily": "mysql"
+    },
+    {
+      "id": "citus",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "citus",
+        "postgresql"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "Citus",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "A",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "timescaledb",
+      "family": "timeseries",
+      "aliases": [
+        "timescale"
+      ],
+      "schemes": [
+        "timescaledb",
+        "postgresql"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "TimescaleDB",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "A",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "greenplum",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "greenplum"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Greenplum",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "B",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "aurora_postgres",
+      "family": "sql",
+      "aliases": [
+        "aurora"
+      ],
+      "schemes": [
+        "aurora"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "Amazon Aurora PostgreSQL",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "A",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "aurora_mysql",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "aurora_mysql"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "mysql",
+      "readonlySession": [
+        "SET SESSION TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "Amazon Aurora MySQL",
+      "emitFamily": "mysql",
+      "placeholder": "question",
+      "executeTier": "A",
+      "connectionFamily": "mysql"
+    },
+    {
+      "id": "enterprisedb",
+      "family": "sql",
+      "aliases": [
+        "edb"
+      ],
+      "schemes": [
+        "edb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "EDB Postgres",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "C",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "oceanbase",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "oceanbase"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "mysql",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "OceanBase",
+      "emitFamily": "mysql",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "mysql"
+    },
+    {
+      "id": "polardb",
+      "family": "sql",
+      "aliases": [
+        "polar_db"
+      ],
+      "schemes": [
+        "polardb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "PolarDB",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "C",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "gaussdb",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "gaussdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "GaussDB",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "C",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "opengauss",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "opengauss"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "openGauss",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "C",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "kingbase",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "kingbase"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "KingbaseES",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "C",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "dameng",
+      "family": "sql",
+      "aliases": [
+        "dm"
+      ],
+      "schemes": [
+        "dm"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Dameng",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "gbase",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "gbase"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "GBase",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "vertica",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "vertica"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "vertica",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "OpenText Vertica",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "B",
+      "connectionFamily": "warehouse"
+    },
+    {
+      "id": "redshift",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "redshift"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Amazon Redshift",
+      "emitFamily": "redshift",
+      "placeholder": "dollar",
+      "executeTier": "A",
+      "connectionFamily": "redshift"
+    },
+    {
+      "id": "snowflake",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "snowflake"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Snowflake",
+      "emitFamily": "snowflake",
+      "placeholder": "question",
+      "executeTier": "A",
+      "connectionFamily": "snowflake"
+    },
+    {
+      "id": "bigquery",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "bigquery"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Google BigQuery",
+      "emitFamily": "bigquery",
+      "placeholder": "at",
+      "executeTier": "A",
+      "connectionFamily": "bigquery"
+    },
+    {
+      "id": "synapse",
+      "family": "warehouse",
+      "aliases": [
+        "azuresynapse"
+      ],
+      "schemes": [
+        "synapse"
+      ],
+      "quoting": "bracket",
+      "limitStyle": "top",
+      "introspect": "mssql",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Azure Synapse",
+      "emitFamily": "tds",
+      "placeholder": "at",
+      "executeTier": "B",
+      "connectionFamily": "tds"
+    },
+    {
+      "id": "teradata",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "teradata"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "teradata",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Teradata",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "B",
+      "connectionFamily": "warehouse"
+    },
+    {
+      "id": "clickhouse",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "clickhouse"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "ClickHouse",
+      "emitFamily": "clickhouse",
+      "placeholder": "question",
+      "executeTier": "B",
+      "connectionFamily": "clickhouse"
+    },
+    {
+      "id": "duckdb",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "duckdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "duckdb",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "DuckDB",
+      "emitFamily": "duckdb",
+      "placeholder": "question",
+      "executeTier": "A",
+      "connectionFamily": "duckdb"
+    },
+    {
+      "id": "databricks",
+      "family": "warehouse",
+      "aliases": [
+        "databricks_sql"
+      ],
+      "schemes": [
+        "databricks"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Databricks SQL",
+      "emitFamily": "databricks",
+      "placeholder": "question",
+      "executeTier": "A",
+      "connectionFamily": "databricks"
+    },
+    {
+      "id": "athena",
+      "family": "warehouse",
+      "aliases": [
+        "awsathena"
+      ],
+      "schemes": [
+        "athena"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Amazon Athena",
+      "emitFamily": "trino",
+      "placeholder": "question",
+      "executeTier": "A",
+      "connectionFamily": "trino"
+    },
+    {
+      "id": "hive",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "hive"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Apache Hive",
+      "emitFamily": "spark",
+      "placeholder": "question",
+      "executeTier": "B",
+      "connectionFamily": "spark"
+    },
+    {
+      "id": "spark_sql",
+      "family": "warehouse",
+      "aliases": [
+        "spark"
+      ],
+      "schemes": [
+        "spark"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Spark SQL",
+      "emitFamily": "spark",
+      "placeholder": "question",
+      "executeTier": "B",
+      "connectionFamily": "spark"
+    },
+    {
+      "id": "prestodb",
+      "family": "warehouse",
+      "aliases": [
+        "presto"
+      ],
+      "schemes": [
+        "presto"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "PrestoDB",
+      "emitFamily": "trino",
+      "placeholder": "question",
+      "executeTier": "B",
+      "connectionFamily": "trino"
+    },
+    {
+      "id": "trino",
+      "family": "warehouse",
+      "aliases": [
+        "trinodb"
+      ],
+      "schemes": [
+        "trino"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Trino",
+      "emitFamily": "trino",
+      "placeholder": "question",
+      "executeTier": "A",
+      "connectionFamily": "trino"
+    },
+    {
+      "id": "impala",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "impala"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Apache Impala",
+      "emitFamily": "spark",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "spark"
+    },
+    {
+      "id": "drill",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "drill"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Apache Drill",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "warehouse"
+    },
+    {
+      "id": "dremio",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "dremio"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Dremio",
+      "emitFamily": "trino",
+      "placeholder": "question",
+      "executeTier": "B",
+      "connectionFamily": "trino"
+    },
+    {
+      "id": "exasol",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "exa"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Exasol",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "warehouse"
+    },
+    {
+      "id": "netezza",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "netezza"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "IBM Netezza",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "warehouse"
+    },
+    {
+      "id": "yellowbrick",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "yellowbrick"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Yellowbrick",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "warehouse"
+    },
+    {
+      "id": "firebolt",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "firebolt"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Firebolt",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "warehouse"
+    },
+    {
+      "id": "materialize",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "materialize"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "Materialize",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "C",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "risingwave",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "risingwave"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "RisingWave",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "C",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "pinot",
+      "family": "warehouse",
+      "aliases": [
+        "apache_pinot"
+      ],
+      "schemes": [
+        "pinot"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Apache Pinot",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "warehouse"
+    },
+    {
+      "id": "druid",
+      "family": "warehouse",
+      "aliases": [
+        "apache_druid"
+      ],
+      "schemes": [
+        "druid"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Apache Druid",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "warehouse"
+    },
+    {
+      "id": "kylin",
+      "family": "warehouse",
+      "aliases": [
+        "apache_kylin"
+      ],
+      "schemes": [
+        "kylin"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Apache Kylin",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "warehouse"
+    },
+    {
+      "id": "starrocks",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "starrocks"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "StarRocks",
+      "emitFamily": "clickhouse",
+      "placeholder": "question",
+      "executeTier": "B",
+      "connectionFamily": "clickhouse"
+    },
+    {
+      "id": "doris",
+      "family": "warehouse",
+      "aliases": [
+        "apache_doris"
+      ],
+      "schemes": [
+        "doris"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "Apache Doris",
+      "emitFamily": "clickhouse",
+      "placeholder": "question",
+      "executeTier": "B",
+      "connectionFamily": "clickhouse"
+    },
+    {
+      "id": "singlestore",
+      "family": "sql",
+      "aliases": [
+        "memsql"
+      ],
+      "schemes": [
+        "singlestore",
+        "memsql"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "mysql",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "SingleStore",
+      "emitFamily": "mysql",
+      "placeholder": "question",
+      "executeTier": "B",
+      "connectionFamily": "mysql"
+    },
+    {
+      "id": "spanner",
+      "family": "sql",
+      "aliases": [
+        "cloudspanner"
+      ],
+      "schemes": [
+        "spanner"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Google Spanner",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "alloydb",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "alloydb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "Google AlloyDB",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "A",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "motherduck",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "motherduck",
+        "duckdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "duckdb",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "MotherDuck",
+      "emitFamily": "duckdb",
+      "placeholder": "question",
+      "executeTier": "A",
+      "connectionFamily": "duckdb"
+    },
+    {
+      "id": "monetdb",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "monetdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [
+        "columnar_projection",
+        "partition_pruning",
+        "predicate_pushdown"
+      ],
+      "description": "MonetDB",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "warehouse"
+    },
+    {
+      "id": "crate",
+      "family": "sql",
+      "aliases": [
+        "cratedb"
+      ],
+      "schemes": [
+        "crate"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "CrateDB",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "questdb",
+      "family": "timeseries",
+      "aliases": [],
+      "schemes": [
+        "questdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "QuestDB",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "timeseries"
+    },
+    {
+      "id": "voltdb",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "voltdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "VoltDB",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "nuodb",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "nuodb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "NuoDB",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "interbase",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "interbase"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "InterBase",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "sqlanywhere",
+      "family": "sql",
+      "aliases": [
+        "anywhere"
+      ],
+      "schemes": [
+        "sqlanywhere"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "SQL Anywhere",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "maxdb",
+      "family": "sql",
+      "aliases": [
+        "sap_maxdb"
+      ],
+      "schemes": [
+        "maxdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "SAP MaxDB",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "percona",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "percona",
+        "mysql"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "mysql",
+      "readonlySession": [
+        "SET SESSION TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "Percona Server",
+      "emitFamily": "mysql",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "mysql"
+    },
+    {
+      "id": "vitess",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "vitess"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "mysql",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Vitess",
+      "emitFamily": "mysql",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "mysql"
+    },
+    {
+      "id": "planetscale",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "planetscale",
+        "mysql"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "mysql",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "PlanetScale",
+      "emitFamily": "mysql",
+      "placeholder": "question",
+      "executeTier": "A",
+      "connectionFamily": "mysql"
+    },
+    {
+      "id": "neon",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "neon",
+        "postgresql"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "Neon",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "A",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "supabase",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "supabase",
+        "postgresql"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "Supabase Postgres",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "A",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "filemaker",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "filemaker"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "FileMaker",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "openedge",
+      "family": "sql",
+      "aliases": [
+        "progress"
+      ],
+      "schemes": [
+        "openedge"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Progress OpenEdge",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "iris",
+      "family": "sql",
+      "aliases": [
+        "cache",
+        "intersystems"
+      ],
+      "schemes": [
+        "iris"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "InterSystems IRIS",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "ignite",
+      "family": "sql",
+      "aliases": [
+        "apache_ignite"
+      ],
+      "schemes": [
+        "ignite"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Apache Ignite",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "sql"
+    },
+    {
+      "id": "selectdb",
+      "family": "warehouse",
+      "aliases": [],
+      "schemes": [
+        "selectdb"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "SelectDB",
+      "emitFamily": "clickhouse",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "clickhouse"
+    },
+    {
+      "id": "vastbase",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "vastbase"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "Vastbase",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "C",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "sequoiadb",
+      "family": "document",
+      "aliases": [],
+      "schemes": [
+        "sequoiadb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "SequoiaDB",
+      "emitFamily": "document",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "document"
+    },
+    {
+      "id": "tdsql",
+      "family": "sql",
+      "aliases": [],
+      "schemes": [
+        "tdsql"
+      ],
+      "quoting": "backtick",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "TDSQL",
+      "emitFamily": "mysql",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "mysql"
+    },
+    {
+      "id": "as400",
+      "family": "sql",
+      "aliases": [
+        "ibm_i",
+        "db2i"
+      ],
+      "schemes": [
+        "as400"
+      ],
+      "quoting": "double",
+      "limitStyle": "fetch",
+      "introspect": "db2",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "IBM i / AS400",
+      "emitFamily": "oracle",
+      "placeholder": "colon",
+      "executeTier": "C",
+      "connectionFamily": "oracle"
+    },
+    {
+      "id": "mongodb",
+      "family": "document",
+      "aliases": [
+        "mongo"
+      ],
+      "schemes": [
+        "mongodb",
+        "mongo"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "mongodb",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "MongoDB",
+      "emitFamily": "document",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "document"
+    },
+    {
+      "id": "couchdb",
+      "family": "document",
+      "aliases": [],
+      "schemes": [
+        "couchdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "couchdb",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Apache CouchDB",
+      "emitFamily": "document",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "document"
+    },
+    {
+      "id": "couchbase",
+      "family": "document",
+      "aliases": [],
+      "schemes": [
+        "couchbase"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "couchbase",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Couchbase",
+      "emitFamily": "document",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "document"
+    },
+    {
+      "id": "dynamodb",
+      "family": "document",
+      "aliases": [],
+      "schemes": [
+        "dynamodb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "dynamodb",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Amazon DynamoDB",
+      "emitFamily": "document",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "document"
+    },
+    {
+      "id": "cosmosdb",
+      "family": "document",
+      "aliases": [
+        "cosmos"
+      ],
+      "schemes": [
+        "cosmos"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "cosmosdb",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Azure Cosmos DB",
+      "emitFamily": "document",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "document"
+    },
+    {
+      "id": "documentdb",
+      "family": "document",
+      "aliases": [],
+      "schemes": [
+        "documentdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "mongodb",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Amazon DocumentDB",
+      "emitFamily": "document",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "document"
+    },
+    {
+      "id": "ravendb",
+      "family": "document",
+      "aliases": [],
+      "schemes": [
+        "ravendb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "RavenDB",
+      "emitFamily": "document",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "document"
+    },
+    {
+      "id": "firestore",
+      "family": "document",
+      "aliases": [
+        "firebase"
+      ],
+      "schemes": [
+        "firestore"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Cloud Firestore",
+      "emitFamily": "document",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "document"
+    },
+    {
+      "id": "faunadb",
+      "family": "document",
+      "aliases": [
+        "fauna"
+      ],
+      "schemes": [
+        "fauna"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Fauna",
+      "emitFamily": "document",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "document"
+    },
+    {
+      "id": "rethinkdb",
+      "family": "document",
+      "aliases": [],
+      "schemes": [
+        "rethinkdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "RethinkDB",
+      "emitFamily": "document",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "document"
+    },
+    {
+      "id": "orientdb",
+      "family": "graph",
+      "aliases": [],
+      "schemes": [
+        "orientdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "OrientDB",
+      "emitFamily": "graph",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "graph"
+    },
+    {
+      "id": "redis",
+      "family": "kv",
+      "aliases": [],
+      "schemes": [
+        "redis"
+      ],
+      "quoting": "double",
+      "limitStyle": "none",
+      "introspect": "redis",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Redis",
+      "emitFamily": "kv",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "kv"
+    },
+    {
+      "id": "keydb",
+      "family": "kv",
+      "aliases": [],
+      "schemes": [
+        "keydb"
+      ],
+      "quoting": "double",
+      "limitStyle": "none",
+      "introspect": "redis",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "KeyDB",
+      "emitFamily": "kv",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "kv"
+    },
+    {
+      "id": "dragonfly",
+      "family": "kv",
+      "aliases": [],
+      "schemes": [
+        "dragonfly"
+      ],
+      "quoting": "double",
+      "limitStyle": "none",
+      "introspect": "redis",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Dragonfly",
+      "emitFamily": "kv",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "kv"
+    },
+    {
+      "id": "valkey",
+      "family": "kv",
+      "aliases": [],
+      "schemes": [
+        "valkey"
+      ],
+      "quoting": "double",
+      "limitStyle": "none",
+      "introspect": "redis",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Valkey",
+      "emitFamily": "kv",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "kv"
+    },
+    {
+      "id": "memcached",
+      "family": "kv",
+      "aliases": [],
+      "schemes": [
+        "memcached"
+      ],
+      "quoting": "double",
+      "limitStyle": "none",
+      "introspect": "memcached",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Memcached",
+      "emitFamily": "kv",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "kv"
+    },
+    {
+      "id": "etcd",
+      "family": "kv",
+      "aliases": [],
+      "schemes": [
+        "etcd"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "etcd",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "etcd",
+      "emitFamily": "kv",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "kv"
+    },
+    {
+      "id": "consul",
+      "family": "kv",
+      "aliases": [],
+      "schemes": [
+        "consul"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Consul KV",
+      "emitFamily": "kv",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "kv"
+    },
+    {
+      "id": "aerospike",
+      "family": "kv",
+      "aliases": [],
+      "schemes": [
+        "aerospike"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Aerospike",
+      "emitFamily": "kv",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "kv"
+    },
+    {
+      "id": "riak",
+      "family": "kv",
+      "aliases": [],
+      "schemes": [
+        "riak"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Riak",
+      "emitFamily": "kv",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "kv"
+    },
+    {
+      "id": "foundationdb",
+      "family": "kv",
+      "aliases": [],
+      "schemes": [
+        "foundationdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "FoundationDB",
+      "emitFamily": "kv",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "kv"
+    },
+    {
+      "id": "tikv",
+      "family": "kv",
+      "aliases": [],
+      "schemes": [
+        "tikv"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "TiKV",
+      "emitFamily": "kv",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "kv"
+    },
+    {
+      "id": "neo4j",
+      "family": "graph",
+      "aliases": [],
+      "schemes": [
+        "neo4j",
+        "bolt"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "neo4j",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Neo4j",
+      "emitFamily": "graph",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "graph"
+    },
+    {
+      "id": "dgraph",
+      "family": "graph",
+      "aliases": [],
+      "schemes": [
+        "dgraph"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Dgraph",
+      "emitFamily": "graph",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "graph"
+    },
+    {
+      "id": "arangodb",
+      "family": "graph",
+      "aliases": [],
+      "schemes": [
+        "arangodb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "ArangoDB",
+      "emitFamily": "graph",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "graph"
+    },
+    {
+      "id": "janusgraph",
+      "family": "graph",
+      "aliases": [],
+      "schemes": [
+        "janusgraph"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "JanusGraph",
+      "emitFamily": "graph",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "graph"
+    },
+    {
+      "id": "nebula",
+      "family": "graph",
+      "aliases": [
+        "nebulagraph"
+      ],
+      "schemes": [
+        "nebula"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "NebulaGraph",
+      "emitFamily": "graph",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "graph"
+    },
+    {
+      "id": "tigergraph",
+      "family": "graph",
+      "aliases": [],
+      "schemes": [
+        "tigergraph"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "TigerGraph",
+      "emitFamily": "graph",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "graph"
+    },
+    {
+      "id": "neptune",
+      "family": "graph",
+      "aliases": [],
+      "schemes": [
+        "neptune"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Amazon Neptune",
+      "emitFamily": "graph",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "graph"
+    },
+    {
+      "id": "memgraph",
+      "family": "graph",
+      "aliases": [],
+      "schemes": [
+        "memgraph"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "neo4j",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Memgraph",
+      "emitFamily": "graph",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "graph"
+    },
+    {
+      "id": "falkordb",
+      "family": "graph",
+      "aliases": [],
+      "schemes": [
+        "falkordb",
+        "redis"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "FalkorDB",
+      "emitFamily": "graph",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "graph"
+    },
+    {
+      "id": "allegrograph",
+      "family": "graph",
+      "aliases": [],
+      "schemes": [
+        "allegrograph"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "AllegroGraph",
+      "emitFamily": "graph",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "graph"
+    },
+    {
+      "id": "stardog",
+      "family": "graph",
+      "aliases": [],
+      "schemes": [
+        "stardog"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Stardog",
+      "emitFamily": "graph",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "graph"
+    },
+    {
+      "id": "elasticsearch",
+      "family": "search",
+      "aliases": [
+        "es"
+      ],
+      "schemes": [
+        "elasticsearch",
+        "es"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "elasticsearch",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Elasticsearch",
+      "emitFamily": "search",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "search"
+    },
+    {
+      "id": "opensearch",
+      "family": "search",
+      "aliases": [],
+      "schemes": [
+        "opensearch"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "elasticsearch",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "OpenSearch",
+      "emitFamily": "search",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "search"
+    },
+    {
+      "id": "solr",
+      "family": "search",
+      "aliases": [],
+      "schemes": [
+        "solr"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Apache Solr",
+      "emitFamily": "search",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "search"
+    },
+    {
+      "id": "meilisearch",
+      "family": "search",
+      "aliases": [
+        "meili"
+      ],
+      "schemes": [
+        "meilisearch"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Meilisearch",
+      "emitFamily": "search",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "search"
+    },
+    {
+      "id": "typesense",
+      "family": "search",
+      "aliases": [],
+      "schemes": [
+        "typesense"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Typesense",
+      "emitFamily": "search",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "search"
+    },
+    {
+      "id": "vespa",
+      "family": "search",
+      "aliases": [],
+      "schemes": [
+        "vespa"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Vespa",
+      "emitFamily": "search",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "search"
+    },
+    {
+      "id": "algolia",
+      "family": "search",
+      "aliases": [],
+      "schemes": [
+        "algolia"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Algolia",
+      "emitFamily": "search",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "search"
+    },
+    {
+      "id": "influxdb",
+      "family": "timeseries",
+      "aliases": [
+        "influx"
+      ],
+      "schemes": [
+        "influxdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "influx",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "InfluxDB",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "timeseries"
+    },
+    {
+      "id": "prometheus",
+      "family": "timeseries",
+      "aliases": [],
+      "schemes": [
+        "prometheus"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Prometheus",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "timeseries"
+    },
+    {
+      "id": "kdb",
+      "family": "timeseries",
+      "aliases": [
+        "kdbplus",
+        "q"
+      ],
+      "schemes": [
+        "kdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "kdb+",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "timeseries"
+    },
+    {
+      "id": "tdengine",
+      "family": "timeseries",
+      "aliases": [],
+      "schemes": [
+        "taos",
+        "tdengine"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "TDengine",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "timeseries"
+    },
+    {
+      "id": "iotdb",
+      "family": "timeseries",
+      "aliases": [],
+      "schemes": [
+        "iotdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Apache IoTDB",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "timeseries"
+    },
+    {
+      "id": "victoriametrics",
+      "family": "timeseries",
+      "aliases": [],
+      "schemes": [
+        "victoriametrics"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "VictoriaMetrics",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "timeseries"
+    },
+    {
+      "id": "opentsdb",
+      "family": "timeseries",
+      "aliases": [],
+      "schemes": [
+        "opentsdb"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "OpenTSDB",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "timeseries"
+    },
+    {
+      "id": "graphite",
+      "family": "timeseries",
+      "aliases": [],
+      "schemes": [
+        "graphite"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Graphite",
+      "emitFamily": "generic",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "timeseries"
+    },
+    {
+      "id": "pinecone",
+      "family": "vector",
+      "aliases": [],
+      "schemes": [
+        "pinecone"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Pinecone",
+      "emitFamily": "vector",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "vector"
+    },
+    {
+      "id": "weaviate",
+      "family": "vector",
+      "aliases": [],
+      "schemes": [
+        "weaviate"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Weaviate",
+      "emitFamily": "vector",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "vector"
+    },
+    {
+      "id": "milvus",
+      "family": "vector",
+      "aliases": [],
+      "schemes": [
+        "milvus"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Milvus",
+      "emitFamily": "vector",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "vector"
+    },
+    {
+      "id": "qdrant",
+      "family": "vector",
+      "aliases": [],
+      "schemes": [
+        "qdrant"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Qdrant",
+      "emitFamily": "vector",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "vector"
+    },
+    {
+      "id": "chroma",
+      "family": "vector",
+      "aliases": [
+        "chromadb"
+      ],
+      "schemes": [
+        "chroma"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Chroma",
+      "emitFamily": "vector",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "vector"
+    },
+    {
+      "id": "pgvector",
+      "family": "vector",
+      "aliases": [],
+      "schemes": [
+        "pgvector",
+        "postgresql"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "pg_catalog",
+      "readonlySession": [
+        "SET default_transaction_read_only = on",
+        "SET TRANSACTION READ ONLY"
+      ],
+      "optimizer": [],
+      "description": "pgvector",
+      "emitFamily": "postgres",
+      "placeholder": "dollar",
+      "executeTier": "C",
+      "connectionFamily": "postgres"
+    },
+    {
+      "id": "cassandra",
+      "family": "wide_column",
+      "aliases": [],
+      "schemes": [
+        "cassandra"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "cassandra",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Apache Cassandra",
+      "emitFamily": "wide_column",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "wide_column"
+    },
+    {
+      "id": "scylla",
+      "family": "wide_column",
+      "aliases": [
+        "scylladb"
+      ],
+      "schemes": [
+        "scylla"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "cassandra",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "ScyllaDB",
+      "emitFamily": "wide_column",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "wide_column"
+    },
+    {
+      "id": "hbase",
+      "family": "wide_column",
+      "aliases": [],
+      "schemes": [
+        "hbase"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Apache HBase",
+      "emitFamily": "wide_column",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "wide_column"
+    },
+    {
+      "id": "accumulo",
+      "family": "wide_column",
+      "aliases": [],
+      "schemes": [
+        "accumulo"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Apache Accumulo",
+      "emitFamily": "wide_column",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "wide_column"
+    },
+    {
+      "id": "bigtable",
+      "family": "wide_column",
+      "aliases": [],
+      "schemes": [
+        "bigtable"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Google Bigtable",
+      "emitFamily": "wide_column",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "wide_column"
+    },
+    {
+      "id": "s3",
+      "family": "object",
+      "aliases": [],
+      "schemes": [
+        "s3"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Amazon S3 Select",
+      "emitFamily": "object",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "object"
+    },
+    {
+      "id": "minio",
+      "family": "object",
+      "aliases": [],
+      "schemes": [
+        "minio"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "MinIO",
+      "emitFamily": "object",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "object"
+    },
+    {
+      "id": "gcs",
+      "family": "object",
+      "aliases": [],
+      "schemes": [
+        "gs",
+        "gcs"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Google Cloud Storage",
+      "emitFamily": "object",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "object"
+    },
+    {
+      "id": "azure_blob",
+      "family": "object",
+      "aliases": [],
+      "schemes": [
+        "azblob"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "Azure Blob Storage",
+      "emitFamily": "object",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "object"
+    },
+    {
+      "id": "hdfs",
+      "family": "object",
+      "aliases": [],
+      "schemes": [
+        "hdfs"
+      ],
+      "quoting": "double",
+      "limitStyle": "limit",
+      "introspect": "information_schema",
+      "readonlySession": [],
+      "optimizer": [],
+      "description": "HDFS",
+      "emitFamily": "object",
+      "placeholder": "question",
+      "executeTier": "C",
+      "connectionFamily": "object"
+    }
+  ]
+}

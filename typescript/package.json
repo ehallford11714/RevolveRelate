@@ -1,0 +1,19 @@
+{
+  "name": "@revolverelate/core",
+  "version": "0.1.0",
+  "description": "Language-agnostic RelOp compiler. Peer of python/revolverelate.",
+  "type": "module",
+  "bin": {
+    "revolverelate": "./src/cli.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types --test tests/golden.test.ts",
+    "cli": "node --experimental-strip-types src/cli.ts"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

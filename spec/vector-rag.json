@@ -1,0 +1,146 @@
+{
+  "title": "Vector overlay and RAG chunks",
+  "description": "Dummy-safe embeddings and retrieve units. RelOp only. The SLM never writes Chroma filters or Mongo pipelines. OverlayChunk is virtual and sandbox-only.",
+  "model": {
+    "id": "hash-16",
+    "dim": 16,
+    "note": "Deterministic signed bag-of-tokens. Dummy overlay always writes this. RelOp does not change when the retrieve model swaps."
+  },
+  "chroma": {
+    "collection": "rr_overlay",
+    "strategies": ["semantic", "causal"],
+    "embedding": {
+      "id": "all-MiniLM-L6-v2",
+      "via": "langchain",
+      "note": "LangChain Embeddings over Chroma ONNX MiniLM, or HuggingFace if installed. The SLM never writes Chroma where-filters — RelOp binds become metadata equality."
+    }
+  },
+  "demoDocs": [
+    {
+      "entity": "Product",
+      "column": "ProductName",
+      "pk": "rag-book",
+      "attach": "name",
+      "needles": ["bookcase", "binder"],
+      "text": "The bookcase holds office binders. Those shelves keep the same binders neat. Bookcases and shelves are furniture for paper storage."
+    },
+    {
+      "entity": "Product",
+      "column": "ProductName",
+      "pk": "rag-chair",
+      "attach": "name",
+      "needles": ["chair", "seating"],
+      "text": "Chairs fill the conference room. Seating around the conference table is tight. Hon deluxe chairs are seating, not storage."
+    },
+    {
+      "entity": "Product",
+      "column": "ProductName",
+      "pk": "rag-cause",
+      "attach": "westFact",
+      "text": "Demand rose in the West. Sales fell because discounting was heavy. Therefore inventory piled up. After that, volume recovered.",
+      "note": "Overlay installer remaps rag-cause to a dummy ProductId that appears on a West order line so attach_source/attach_fact can join. Still sandboxOnly."
+    }
+  ],
+  "overlayEntity": "OverlayChunk",
+  "overlayColumns": [
+    "ChunkId",
+    "Entity",
+    "SourcePk",
+    "Column",
+    "Strategy",
+    "Ordinal",
+    "Level",
+    "Text",
+    "Hash",
+    "Norm",
+    "Vec",
+    "Cue",
+    "Role",
+    "Score",
+    "ParentId",
+    "Model",
+    "Dim"
+  ],
+  "semantic": {
+    "method": "breakpoint",
+    "percentile": 0.75,
+    "minTokens": 4,
+    "maxTokens": 80,
+    "note": "Kamradt-style consecutive embedding-distance peaks. Break where 1-cosine exceeds the percentile of adjacent gaps, unless the current group is under minTokens; always break past maxTokens. hash-16 is a stand-in; the RelOp (scan OverlayChunk, filter Strategy) does not change when the model does."
+  },
+  "topic": {
+    "method": "centroid",
+    "threshold": 0.2,
+    "maxTokens": 64,
+    "note": "Compare the next sentence to the running L2-normalized mean of the current group. A topic shift is a drop below threshold."
+  },
+  "causal": {
+    "method": "cue-role",
+    "intraSentence": true,
+    "note": "Split on discourse cues, tag cause/effect/condition/event/contrast, and pair antecedent with consequent inside a sentence when the cue is mid-clause."
+  },
+  "strategies": [
+    {"id": "fixed", "title": "Fixed token windows"},
+    {"id": "token", "title": "Overlapping token windows"},
+    {"id": "sentence", "title": "One sentence"},
+    {"id": "window", "title": "Sliding sentences"},
+    {"id": "recursive", "title": "Paragraph then sentence then token"},
+    {"id": "semantic", "title": "Break on embedding-distance peaks"},
+    {"id": "causal", "title": "Cause, effect, condition, and event units"},
+    {"id": "hier", "title": "Parent passage and child sentences"},
+    {"id": "prop", "title": "Clause / proposition splits"},
+    {"id": "late", "title": "Full text for embed, sentences for retrieve"},
+    {"id": "topic", "title": "Break when the next sentence leaves the group centroid"},
+    {"id": "discourse", "title": "Contrast and concession units"},
+    {"id": "event", "title": "Temporal event chain"}
+  ],
+  "causalTaxonomy": {
+    "cause": ["because", "due to", "caused", "led to", "as a result of"],
+    "effect": ["therefore", "thus", "hence", "consequently", "accordingly", "thereby", "as a result"],
+    "condition": ["if", "unless", "so that"],
+    "temporal": ["after", "before", "when", "first", "then", "next", "later", "finally", "meanwhile"],
+    "contrast": ["however", "although", "whereas", "instead", "nevertheless", "on the other hand"]
+  },
+  "causalCues": [
+    "because",
+    "therefore",
+    "thus",
+    "hence",
+    "consequently",
+    "accordingly",
+    "thereby",
+    "so that",
+    "as a result",
+    "as a result of",
+    "caused",
+    "led to",
+    "due to",
+    "if",
+    "unless",
+    "then",
+    "after",
+    "before",
+    "when",
+    "first",
+    "finally",
+    "next",
+    "later",
+    "meanwhile",
+    "however",
+    "although",
+    "whereas",
+    "instead",
+    "nevertheless"
+  ],
+  "intraSentence": [
+    {"pattern": "because", "left": "effect", "right": "cause"},
+    {"pattern": "due to", "left": "effect", "right": "cause"},
+    {"pattern": "as a result of", "left": "effect", "right": "cause"},
+    {"pattern": "led to", "left": "cause", "right": "effect"},
+    {"pattern": "caused", "left": "cause", "right": "effect"},
+    {"pattern": "so that", "left": "cause", "right": "condition"},
+    {"pattern": "therefore", "left": "cause", "right": "effect"},
+    {"pattern": "thus", "left": "cause", "right": "effect"},
+    {"pattern": "if", "left": "condition", "right": "effect"}
+  ]
+}

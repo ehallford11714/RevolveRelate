@@ -1,0 +1,36 @@
+{
+  "name": "scan-project",
+  "ir": {
+    "kind": "query",
+    "op": {
+      "op": "limit",
+      "count": 50,
+      "input": {
+        "op": "project",
+        "items": [
+          { "expr": { "expr": "col", "entity": "Customer", "attr": "CustomerId" }, "alias": "id" },
+          { "expr": { "expr": "col", "entity": "Customer", "attr": "LastName" }, "alias": "last" }
+        ],
+        "input": { "op": "scan", "entity": "Customer", "alias": "Customer" }
+      }
+    }
+  },
+  "sql": {
+    "postgres": "SELECT \"Customer\".\"CustomerId\" AS \"id\", \"Customer\".\"LastName\" AS \"last\" FROM \"Customer\" AS \"Customer\" LIMIT 50",
+    "sqlite": "SELECT \"Customer\".\"CustomerId\" AS \"id\", \"Customer\".\"LastName\" AS \"last\" FROM \"Customer\" AS \"Customer\" LIMIT 50",
+    "duckdb": "SELECT \"Customer\".\"CustomerId\" AS \"id\", \"Customer\".\"LastName\" AS \"last\" FROM \"Customer\" AS \"Customer\" LIMIT 50",
+    "mysql": "SELECT `Customer`.`CustomerId` AS `id`, `Customer`.`LastName` AS `last` FROM `Customer` AS `Customer` LIMIT 50",
+    "tds": "SELECT TOP 50 [Customer].[CustomerId] AS [id], [Customer].[LastName] AS [last] FROM [Customer] AS [Customer]",
+    "snowflake": "SELECT \"Customer\".\"CustomerId\" AS \"id\", \"Customer\".\"LastName\" AS \"last\" FROM \"Customer\" AS \"Customer\" LIMIT 50",
+    "bigquery": "SELECT `Customer`.`CustomerId` AS `id`, `Customer`.`LastName` AS `last` FROM `Customer` AS `Customer` LIMIT 50"
+  },
+  "params": {
+    "postgres": [],
+    "sqlite": [],
+    "duckdb": [],
+    "mysql": [],
+    "tds": [],
+    "snowflake": [],
+    "bigquery": []
+  }
+}

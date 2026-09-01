@@ -1,0 +1,10 @@
+{
+  "name": "revolverelate-demo-server",
+  "private": true,
+  "type": "module",
+  "description": "Node HTTP backend over live Superstore. RelOp worker is Python; browse and promote hit the live sqlite file.",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test test.mjs"
+  }
+}

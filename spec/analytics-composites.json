@@ -1,0 +1,66 @@
+{
+  "title": "RevolveRelate composite chain rules",
+  "description": "Legal ways to chain analytics primitives. A composite is an ordered list of atoms. Phases are non-decreasing except at a with_cte reset. Never SQL.",
+  "depth": {
+    "min": 1,
+    "typicalMin": 3,
+    "typicalMax": 8,
+    "deep": 12,
+    "hardMax": 24,
+    "note": "Each step is one primitive. Deep chains use with_cte to start a second pass instead of going backwards."
+  },
+  "phases": [
+    {"id": "quest", "rank": 8, "families": ["search", "intent"], "anytime": true},
+    {"id": "open", "rank": 10, "families": ["source"], "lateIds": []},
+    {"id": "attach", "rank": 20, "families": ["grain", "nested", "match"]},
+    {"id": "scope", "rank": 30, "families": ["restrict", "time", "calendar"]},
+    {"id": "profile", "rank": 35, "families": ["quality"], "anytime": true},
+    {"id": "events", "rank": 40, "families": ["sequence"]},
+    {"id": "reshape", "rank": 45, "families": ["shape"]},
+    {"id": "split", "rank": 46, "families": ["chunk"]},
+    {"id": "retrieve", "rank": 48, "families": ["vector"]},
+    {"id": "rowmath", "rank": 50, "families": ["derive"], "anytimeBefore": 90},
+    {"id": "world", "rank": 52, "families": ["world"]},
+    {"id": "merge", "rank": 55, "families": ["set"]},
+    {"id": "collapse", "rank": 60, "families": ["aggregate", "stat", "hierarchy"]},
+    {"id": "peers", "rank": 70, "families": ["window"]},
+    {"id": "baseline", "rank": 80, "families": ["compare"]},
+    {"id": "keep", "rank": 90, "families": ["cut"]},
+    {"id": "finish", "rank": 95, "families": ["project"], "lateIds": ["sort_asc", "sort_desc", "sort_value_desc", "limit", "offset"]}
+  ],
+  "resets": ["with_cte", "scan_fact", "scan_entity", "scan_dimension", "scan_measure", "scan_date", "values_one", "overlay", "ask_log", "hypothesize", "socratic", "ideate", "explore", "abduce"],
+  "rules": [
+    {"id": "depth_hard", "text": "A chain may not exceed hardMax steps (24)."},
+    {"id": "phase_forward", "text": "Phase rank is non-decreasing unless the step is a reset (with_cte or a new scan)."},
+    {"id": "one_collapse", "text": "At most one collapse (aggregate|stat|hierarchy) per pass. Start a second pass with with_cte to collapse again."},
+    {"id": "restrict_after_collapse", "text": "restrict after collapse is HAVING-style and is legal."},
+    {"id": "compare_after_score", "text": "compare should follow collapse or window so a value alias exists."},
+    {"id": "cut_after_score", "text": "cut should follow collapse, window, or compare."},
+    {"id": "quality_anytime", "text": "quality may appear in any phase (gate or post-check)."},
+    {"id": "derive_before_cut", "text": "derive may appear before cut (rank < 90) even after collapse."},
+    {"id": "project_split", "text": "project_measure / rename / distinct_col may appear early (rank 15). sort_* / limit / offset are finish (95)."},
+    {"id": "set_is_pass", "text": "set replaces collapse for a key-set question; do not mix set with aggregate in the same pass."},
+    {"id": "second_pass", "text": "with_cte then scan_fact (or scan of the CTE name via with_cte body) starts pass 2. That is how chains go deeper than one reduce."}
+  ],
+  "patterns": [
+    {"id": "slice_agg_cut", "families": ["source", "restrict", "aggregate", "project"], "depth": 5},
+    {"id": "slice_agg_compare", "families": ["source", "restrict", "aggregate", "compare", "project"], "depth": 6},
+    {"id": "shape_derive", "families": ["source", "shape", "derive"], "depth": 3},
+    {"id": "quality_then_kpi", "families": ["source", "quality", "source", "aggregate"], "depth": 5, "resets": true},
+    {"id": "deep_pass", "families": ["source", "grain", "restrict", "time", "aggregate", "compare", "cut", "project"], "depth": 9},
+    {"id": "two_pass", "families": ["source", "aggregate", "source", "window", "cut"], "depth": 8, "resets": true},
+    {"id": "rag_retrieve", "families": ["source", "chunk", "vector"], "depth": 4},
+    {"id": "rag_answer", "families": ["source", "chunk", "vector", "aggregate", "compare"], "depth": 7},
+    {"id": "what_if", "families": ["source", "world", "compare"], "depth": 4},
+    {"id": "pearl_backdoor", "families": ["source", "restrict"], "depth": 2},
+    {"id": "causal_pair", "families": ["source", "chunk", "vector", "world"], "depth": 5},
+    {"id": "causal_world", "families": ["source", "chunk", "vector", "world", "compare"], "depth": 8},
+    {"id": "causal_explore", "families": ["intent", "search", "world"], "depth": 1, "note": "Python actuator: enumerate causal composites, sandbox-score, AskLog, winner. Not a single SQL tree."},
+    {"id": "socratic_quest", "families": ["intent"], "depth": 1}
+  ],
+  "illegal": [
+    {"example": ["agg_sum_by", "scan_fact"], "why": "scan after collapse without with_cte is a new pass — use with_cte first or keep going forward."},
+    {"example": ["limit", "agg_sum_by"], "why": "Cannot collapse after finish."},
+    {"example": ["cut", "join_inner"], "why": "Cannot attach grain after a cut."}
+  ]
+}

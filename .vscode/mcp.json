@@ -1,0 +1,14 @@
+{
+  "servers": {
+    "revolverelate": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "revolverelate.mcp"],
+      "cwd": "${workspaceFolder}/python",
+      "env": {
+        "PYTHONUTF8": "1",
+        "PYTHONPATH": "${workspaceFolder}/python/src"
+      }
+    }
+  }
+}
